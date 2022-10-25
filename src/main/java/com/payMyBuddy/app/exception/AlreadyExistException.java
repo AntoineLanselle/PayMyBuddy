@@ -6,9 +6,9 @@ package com.payMyBuddy.app.exception;
  * @author Antoine
  */
 public class AlreadyExistException extends Exception {
-	
+
 	private static final long serialVersionUID = 2L;
-	
+
 	/**
 	 * Construit une AlreadyExistException.
 	 * 
@@ -18,5 +18,5 @@ public class AlreadyExistException extends Exception {
 	public AlreadyExistException(String message) {
 		super(message);
 	}
-	
+
 }

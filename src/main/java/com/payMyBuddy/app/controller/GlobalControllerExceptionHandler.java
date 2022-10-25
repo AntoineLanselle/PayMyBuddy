@@ -30,7 +30,7 @@ public class GlobalControllerExceptionHandler {
 		// Logger
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 	}
-	
+
 	/**
 	 * Gêre l'erreur AlreadyExistException.
 	 * 

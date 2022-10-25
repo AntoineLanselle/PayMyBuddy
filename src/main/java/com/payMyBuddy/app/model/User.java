@@ -1,9 +1,19 @@
 package com.payMyBuddy.app.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -12,91 +22,132 @@ import javax.persistence.Table;
  * @author Antoine
  */
 @Entity
-@Table(name = "utilisateur")
+@Table(name = "user")
 public class User {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private int id;
-	
-	//@Column(name = "")
-	public String email;
-	
-	public String password; 
-	
-	public List<User> contacts;
-	
-	public List<Transaction> transactions;
-	
-	public float balance;
-	
+
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "password")
+	private String password;
+
+	@Column(name = "balance")
+	private float balance;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "user_connection", 
+			joinColumns = @JoinColumn(name = "user_id"), 
+			inverseJoinColumns = @JoinColumn(name = "connection_id"))
+	  private List<User> connections = new ArrayList<>();
+
+	@OneToMany(mappedBy = "payer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<TransactionUser> transactionsUser = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<TransactionBank> transactionsAccount = new ArrayList<>();
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	/**
 	 * @return the email
 	 */
 	public String getEmail() {
 		return email;
 	}
-	
+
 	/**
 	 * @param email the email to set
 	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	/**
 	 * @return the password
 	 */
 	public String getPassword() {
 		return password;
 	}
-	
+
 	/**
 	 * @param password the password to set
 	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	/**
-	 * @return the contacts
-	 */
-	public List<User> getContacts() {
-		return contacts;
-	}
-	
-	/**
-	 * @param contacts the contacts to set
-	 */
-	public void setContacts(List<User> contacts) {
-		this.contacts = contacts;
-	}
-	
-	/**
-	 * @return the transactions
-	 */
-	public List<Transaction> getTransactions() {
-		return transactions;
-	}
-	
-	/**
-	 * @param transactions the transactions to set
-	 */
-	public void setTransactions(List<Transaction> transactions) {
-		this.transactions = transactions;
-	}
-	
+
 	/**
 	 * @return the balance
 	 */
 	public float getBalance() {
 		return balance;
 	}
-	
+
 	/**
 	 * @param balance the balance to set
 	 */
 	public void setBalance(float balance) {
 		this.balance = balance;
 	}
+
+	/**
+	 * @return the connections
+	 */
+	public List<User> getConnections() {
+		return connections;
+	}
+
+	/**
+	 * @param connections the connections to set
+	 */
+	public void setConnections(List<User> connections) {
+		this.connections = connections;
+	}
+
+	/**
+	 * @return the transactionsUser
+	 */
+	public List<TransactionUser> getTransactionsUser() {
+		return transactionsUser;
+	}
+
+	/**
+	 * @param transactionsUser the transactionsUser to set
+	 */
+	public void setTransactionsUser(List<TransactionUser> transactionsUser) {
+		this.transactionsUser = transactionsUser;
+	}
+
+	/**
+	 * @return the transactionsAccount
+	 */
+	public List<TransactionBank> getTransactionsAccount() {
+		return transactionsAccount;
+	}
+
+	/**
+	 * @param transactionsAccount the transactionsAccount to set
+	 */
+	public void setTransactionsAccount(List<TransactionBank> transactionsAccount) {
+		this.transactionsAccount = transactionsAccount;
+	}	
 	
 }

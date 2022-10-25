@@ -6,7 +6,7 @@ package com.payMyBuddy.app.exception;
  * @author Antoine
  */
 public class RessourceNotFoundException extends Exception {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/**
