@@ -27,11 +27,11 @@ public class TransactionUser {
 	private int id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "payer_id", nullable = false) 
+    @JoinColumn(name = "payer_id") 
 	private User payer;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "receiver_id", nullable = false) 
+    @JoinColumn(name = "receiver_id") 
 	private User receiver;
 
 	@Column(name = "date")

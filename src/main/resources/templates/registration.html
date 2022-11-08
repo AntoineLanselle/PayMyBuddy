@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="utf-8">
+<title>PayMyBuddy - Registration</title>
+</head>
+
+<body>
+
+	<h2>Registration</h2>
+
+	<form method="post" th:action="@{/registration}" th:object="${user}">
+
+		<div th:if="${param.success}">
+			<p>Successfully registered!</p>
+		</div>
+
+		<input name="email" type="text" placeholder="Email" th:field="*{email}" />
+
+		<input name="password" type="password" placeholder="Password" th:field="*{password}" /> 
+		
+		<input name="passwordConfirm" type="password"	placeholder="Confirm Password" th:field="*{passwordConfirm}" />
+
+		<button name="register-submit" type="submit">Register</button>
+
+	</form>
+
+	<span>Already registred? <a href="/" th:href="@{/login}">Login
+			here</a></span>
+
+</body>
+
+</html>

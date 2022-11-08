@@ -3,7 +3,6 @@ package com.payMyBuddy.app.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -46,12 +45,21 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "connection_id"))
 	  private List<User> connections = new ArrayList<>();
 
-	@OneToMany(mappedBy = "payer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "payer", fetch = FetchType.LAZY)
 	private List<TransactionUser> transactionsUser = new ArrayList<>();
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<TransactionBank> transactionsAccount = new ArrayList<>();
-
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	private List<TransactionBank> transactionsBank = new ArrayList<>();
+	
+	public User(String email, String password) {
+		setEmail(email);
+		setPassword(password);
+		setBalance(0);
+	}
+	
+	public User() {
+	}
+	
 	/**
 	 * @return the id
 	 */
@@ -140,14 +148,14 @@ public class User {
 	 * @return the transactionsAccount
 	 */
 	public List<TransactionBank> getTransactionsAccount() {
-		return transactionsAccount;
+		return transactionsBank;
 	}
 
 	/**
 	 * @param transactionsAccount the transactionsAccount to set
 	 */
 	public void setTransactionsAccount(List<TransactionBank> transactionsAccount) {
-		this.transactionsAccount = transactionsAccount;
+		this.transactionsBank = transactionsAccount;
 	}	
 	
 }

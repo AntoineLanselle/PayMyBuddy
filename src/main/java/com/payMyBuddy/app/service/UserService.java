@@ -3,35 +3,35 @@ package com.payMyBuddy.app.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.payMyBuddy.app.DTO.UserRegistrationDTO;
+import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.User;
-import com.payMyBuddy.app.repository.UserRepository;
 
 /**
  * 
- * 
  * @author Antoine
  */
-@Service
-public class UserService {
+public interface UserService extends UserDetailsService {
 
-	private static final Logger LOGGER = LogManager.getLogger(UserService.class);
+	public List<User> getUsers();
+
+	public Optional<User> getUserById(Integer id);
+
+	public User addUser(User user) throws AlreadyExistException;
 	
-	@Autowired
-	private UserRepository userRepository;
+	public User saveUser(UserRegistrationDTO userRegistration) throws AlreadyExistException;
 
-	public List<User> getUsers() {
-		LOGGER.info("Getting all Users");
-		return userRepository.findAll();
-	}
+	public User updateUser(User user) throws RessourceNotFoundException;
 
-	public Optional<User> getUserById(Integer id) {
-		LOGGER.info("Getting User with Id: " + id);
-		return userRepository.findById(id);
-	}
+	public void deleteUser(User user) throws RessourceNotFoundException;
+
+	public void deleteUser(Integer id) throws RessourceNotFoundException;
 	
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+
 }

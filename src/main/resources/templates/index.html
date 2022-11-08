@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http:///www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+<meta charset="utf-8">
+<title>PayMyBuddy - Home</title>
+</head>
+
+<body>
+
+	<div>
+		<h1>Home</h1>
+		Welcome home <span sec:authentication="principal.username"> User</span> !
+	</div>
+	
+	<span sec:authorize="isAuthenticated()"><a th:href="@/logout">Logout</a></span>
+
+</body>
+
+</html>

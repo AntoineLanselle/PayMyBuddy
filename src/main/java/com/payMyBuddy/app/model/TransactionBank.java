@@ -27,7 +27,7 @@ public class TransactionBank {
 	private int id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
 	private User user;
 
 	@Column(name = "date")
