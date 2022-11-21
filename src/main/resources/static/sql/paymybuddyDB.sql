@@ -1,4 +1,4 @@
-DROP DATABASE payMyBuddy IF EXISTS payMyBuddy;
+DROP DATABASE payMyBuddy;
 
 CREATE DATABASE payMyBuddy;
 
@@ -62,6 +62,9 @@ VALUES
 
 INSERT INTO `transaction_user` (`payer_id`, `receiver_id`, `amount`, `description`) 
 VALUES 
+(5, 7, 42, 'truc de dingue'),
+(7, 5, 2000, 'nouveau pc WOW'),
+(5, 7, 2, 'petit casse croute'),
 (1, 2, 12, 'Place de cinéma'),
 (1, 2, 25, 'Restaurant McDonalds'),
 (4, 3, 200, 'Jardinage'),

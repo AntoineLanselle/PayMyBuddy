@@ -20,14 +20,14 @@ import com.payMyBuddy.app.service.UserServiceImpl;
 @SpringBootApplication
 public class PayMyBuddyApplication implements CommandLineRunner {
 
-	@Autowired
-	private UserServiceImpl userService;
+	//@Autowired
+	//private UserServiceImpl userService;
 
-	@Autowired
-	private TransactionBankServiceImpl transactionBankService;
+	//@Autowired
+	//private TransactionBankServiceImpl transactionBankService;
 
-	@Autowired
-	private TransactionUserServiceImpl transactionUserService;
+	//@Autowired
+	//private TransactionUserServiceImpl transactionUserService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PayMyBuddyApplication.class, args);
@@ -40,7 +40,7 @@ public class PayMyBuddyApplication implements CommandLineRunner {
 	 */
 	@Override
 	public void run(String... args) throws Exception {
-		
+		/*
 		Iterable<User> users = userService.getUsers();
 		for (User user : users) {
 			System.out.println(
@@ -60,7 +60,7 @@ public class PayMyBuddyApplication implements CommandLineRunner {
 		for (TransactionUser transaction : transactionUsers) {
 			System.out.println("Id: " + transaction.getId() + " | payer: " + transaction.getPayer().getEmail()
 					+ " | receiver: " + transaction.getReceiver().getEmail() + " | amount: " + transaction.getAmount());
-		}
+		}*/
 	}
 
 }

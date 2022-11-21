@@ -4,7 +4,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>PayMyBuddy - Home</title>
+	<title>PayMyBuddy - Transfer</title>
 	<link rel="stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap">
 	<link rel="stylesheet" href="/css/style.css">
@@ -28,8 +28,35 @@
 
 		<div class="content">
 
-			<h1>Home</h1>
-			<p>test test test test test test test test test test</p>
+			<h1>Transfer</h1>
+
+			<h3>Your balance: <span th:text="${user.balance}">amount</span></h3>
+
+			<table>
+				<thead>
+					<tr>
+						<th colspan="6">Transfer list</th>
+					</tr>
+					<tr>
+						<th>Id</th>
+						<th>Payer</th>
+						<th>Receiver</th>
+						<th>Description</th>
+						<th>Date</th>
+						<th>Amount</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="transfer: ${transfers}">
+						<td th:text="${transfer.id}">id</td>
+						<td th:text="${transfer.payer.email}">payer</td>
+						<td th:text="${transfer.receiver.email}">receiver</td>
+						<td th:text="${transfer.description}">description</td>
+						<td th:text="${transfer.date}">date</td>
+						<td th:text="${transfer.amount}">amount</td>
+					</tr>
+				</tbody>
+			</table>
 
 		</div>
 

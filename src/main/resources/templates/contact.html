@@ -4,7 +4,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>PayMyBuddy - Home</title>
+	<title>PayMyBuddy - Contact</title>
 	<link rel="stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap">
 	<link rel="stylesheet" href="/css/style.css">
@@ -28,8 +28,49 @@
 
 		<div class="content">
 
-			<h1>Home</h1>
-			<p>test test test test test test test test test test</p>
+			<h1>Contact</h1>
+
+			<form method="post" th:action="@{/contact}">
+
+				<div class="input">
+					<label for"email">Email</label>
+					<input class="sec-2" name="email" type="email" placeholder="Username@gmail.com" />
+				</div>
+
+				<div class="error" th:if="${param.success}">
+					<p>New connection successfully registered!</p>
+				</div>
+
+				<div class="error" th:if="${param.error}">
+					<p>User not found.</p>
+				</div>
+
+				<button name="add-connection" type="submit">Add Connection</button>
+
+			</form>
+
+			<table>
+				<thead>
+					<tr>
+						<th colspan="2">Contact list</th>
+					</tr>
+					<tr>
+						<th>Id</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="user: ${users}">
+						<td name="id" th:text="${user.id}">id</td>
+						<td th:text="${user.email}">email</td>
+						<td>
+							<form method="post" th:action="@{/deleteConnection}">
+								<button class="delete-connection" type="submit" name="id" th:value="${user.id}">X</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 
 		</div>
 

@@ -2,32 +2,61 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-<meta charset="utf-8">
-<title>PayMyBuddy - Registration</title>
+	<meta charset="utf-8">
+	<title>PayMyBuddy - Registration</title>
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap">
+	<link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
 
-	<h2>Registration</h2>
+	<div class="screen-1">
 
-	<form method="post" th:action="@{/registration}" th:object="${user}">
+		<img class="logo" src="/img/logo.png" alt="Logo PayMyBuddy">
 
-		<div th:if="${param.success}">
-			<p>Successfully registered!</p>
+		<div class="content">
+
+			<form method="post" th:action="@{/registration}" th:object="${user}">
+
+				<div class="input">
+					<label for"email">Email</label>
+					<input class="sec-2" name="email" type="email" placeholder="Username@gmail.com"
+						th:field="*{email}" />
+				</div>
+
+				<div class="input">
+					<label for"password">Password</label>
+					<input cclass="sec-2" name="password" type="password" placeholder="············"
+						th:field="*{password}" />
+				</div>
+
+				<div class="input">
+					<label for"passwordConfirm">Confirm Password</label>
+					<input class="sec-2" name="passwordConfirm" type="password" placeholder="············"
+						th:field="*{passwordConfirm}" />
+				</div>
+
+				<div class="error" th:if="${param.success}">
+					<p>Successfully registered!</p>
+				</div>
+
+				<div class="error" th:if="${param.error}">
+					<p>Email already exist.</p>
+				</div>
+
+				<button name="register-submit" type="submit">Register</button>
+
+			</form>
 		</div>
 
-		<input name="email" type="text" placeholder="Email" th:field="*{email}" />
+		<div class="footer">
+			<span>
+				Already registred? <a href="/" th:href="@{/login}">Login</a>
+			</span>
+		</div>
 
-		<input name="password" type="password" placeholder="Password" th:field="*{password}" /> 
-		
-		<input name="passwordConfirm" type="password"	placeholder="Confirm Password" th:field="*{passwordConfirm}" />
-
-		<button name="register-submit" type="submit">Register</button>
-
-	</form>
-
-	<span>Already registred? <a href="/" th:href="@{/login}">Login
-			here</a></span>
+	</div>
 
 </body>
 

@@ -34,4 +34,12 @@ public interface UserService extends UserDetailsService {
 	
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
+	public void saveConnection(User user, String email) throws RessourceNotFoundException, AlreadyExistException;
+
+	User getCurrentUser();
+
+	public User findByEmail(String email);
+
+	Boolean existsByEmail(String email);
+
 }
