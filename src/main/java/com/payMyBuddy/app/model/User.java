@@ -147,15 +147,15 @@ public class User {
 	/**
 	 * @return the transactionsAccount
 	 */
-	public List<TransactionBank> getTransactionsAccount() {
+	public List<TransactionBank> getTransactionsBank() {
 		return transactionsBank;
 	}
 
 	/**
 	 * @param transactionsAccount the transactionsAccount to set
 	 */
-	public void setTransactionsAccount(List<TransactionBank> transactionsAccount) {
-		this.transactionsBank = transactionsAccount;
+	public void setTransactionsBank(List<TransactionBank> transactionsBank) {
+		this.transactionsBank = transactionsBank;
 	}	
 	
 }

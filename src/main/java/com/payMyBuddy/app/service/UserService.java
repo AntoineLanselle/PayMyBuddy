@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.payMyBuddy.app.DTO.UserRegistrationDTO;
 import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleConnectionException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.User;
 
@@ -41,5 +42,7 @@ public interface UserService extends UserDetailsService {
 	public User findByEmail(String email);
 
 	Boolean existsByEmail(String email);
+
+	public void newConnection(User user, String email) throws ImpossibleConnectionException, RessourceNotFoundException;
 
 }

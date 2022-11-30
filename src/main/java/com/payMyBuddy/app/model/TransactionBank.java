@@ -84,15 +84,15 @@ public class TransactionBank {
 	/**
 	 * @return the bankAccount
 	 */
-	public String getBankAccount() {
+	public String getBankaccount() {
 		return bankaccount;
 	}
 
 	/**
 	 * @param bankAccount the bankAccount to set
 	 */
-	public void setBankAccount(String bankAccount) {
-		this.bankaccount = bankAccount;
+	public void setBankaccount(String bankaccount) {
+		this.bankaccount = bankaccount;
 	}
 
 	/**

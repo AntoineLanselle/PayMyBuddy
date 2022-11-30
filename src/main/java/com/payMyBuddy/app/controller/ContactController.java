@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleConnectionException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.service.UserService;
@@ -19,7 +20,6 @@ import com.payMyBuddy.app.service.UserService;
  * @author Antoine
  */
 @Controller
-//@RequestMapping("/contact")
 public class ContactController {
 
 	private static final Logger LOGGER = LogManager.getLogger(ContactController.class);
@@ -49,11 +49,12 @@ public class ContactController {
 	public String addConnection(@RequestParam String email) throws AlreadyExistException, RessourceNotFoundException {
 		LOGGER.info("Add connection in database - " + email);
 		User user = userService.getCurrentUser();
-        User newConnection = userService.findByEmail(email);
-    	user.getConnections().add(newConnection);
-    	userService.updateUser(user);
-
-    	return "redirect:/contact";
+		try {
+			userService.newConnection(user, email);
+			return "redirect:/contact?sucess";
+		} catch(ImpossibleConnectionException e) {
+			return "redirect:/contact?error";
+		}
 	}
 	
 	/**

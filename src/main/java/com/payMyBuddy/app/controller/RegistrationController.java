@@ -42,8 +42,8 @@ public class RegistrationController {
 	 * 
 	 */
 	@PostMapping
-	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDTO userRegistration) throws AlreadyExistException {
-		LOGGER.info("Add user in database - " + userRegistration.getEmail());
+	public String postRegisterUserAccount(@ModelAttribute("user") UserRegistrationDTO userRegistration) throws AlreadyExistException {
+		LOGGER.info("POST - Add user in database - " + userRegistration.getEmail());
 		userService.saveUser(userRegistration);
 		return "redirect:/registration?success";
 	}

@@ -2,8 +2,13 @@ package com.payMyBuddy.app.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.service.UserService;
 
 /**
  * 
@@ -13,6 +18,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class WebController {
 
 	private static final Logger LOGGER = LogManager.getLogger(WebController.class);
+	
+	@Autowired
+	private UserService userService;
 	
 	/**
 	 * 
@@ -27,18 +35,11 @@ public class WebController {
 	 * 
 	 */
 	@GetMapping("/index")
-	public String getHomePage() {
-		LOGGER.info("GET - home page");
+	public String getHomePage(Model model) {
+		User user = userService.getCurrentUser();
+		model.addAttribute("email", user.getEmail());
+		LOGGER.info("GET - " + user.getEmail() + " home page");
 		return "index";
-	}
-	
-	/**
-	 * 
-	 */
-	@GetMapping("/profile")
-	public String getProfilePage() {
-		LOGGER.info("GET - profile page");
-		return "profile";
 	}
 	
 }

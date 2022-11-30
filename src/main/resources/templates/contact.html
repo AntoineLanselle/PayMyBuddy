@@ -30,7 +30,7 @@
 
 			<h1>Contact</h1>
 
-			<form method="post" th:action="@{/contact}">
+			<form method="POST" th:action="@{/contact}">
 
 				<div class="input">
 					<label for"email">Email</label>
@@ -42,7 +42,7 @@
 				</div>
 
 				<div class="error" th:if="${param.error}">
-					<p>User not found.</p>
+					<p>Can't add this user to contact list.</p>
 				</div>
 
 				<button name="add-connection" type="submit">Add Connection</button>
@@ -64,7 +64,7 @@
 						<td name="id" th:text="${user.id}">id</td>
 						<td th:text="${user.email}">email</td>
 						<td>
-							<form method="post" th:action="@{/deleteConnection}">
+							<form method="POST" th:action="@{/deleteConnection}">
 								<button class="delete-connection" type="submit" name="id" th:value="${user.id}">X</button>
 							</form>
 						</td>

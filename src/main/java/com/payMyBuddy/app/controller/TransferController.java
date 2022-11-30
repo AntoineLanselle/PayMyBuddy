@@ -6,9 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.payMyBuddy.app.DTO.TransferUserDTO;
+import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleTransferException;
+import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.service.TransactionUserService;
 import com.payMyBuddy.app.service.UserService;
 
 @Controller
@@ -19,7 +26,9 @@ public class TransferController {
 
 	@Autowired
 	private UserService userService;
-
+	@Autowired
+	private TransactionUserService transactionUserService;
+	
 	/**
 	 * 
 	 */
@@ -34,4 +43,22 @@ public class TransferController {
 		return "transfer";
 	}
 
+	/**
+	 * @throws AlreadyExistException 
+	 * @throws RessourceNotFoundException 
+	 * @throws ImpossibleTransferException 
+	 * 
+	 */
+	@PostMapping
+	public String postTransferWithUser(@ModelAttribute("transferUser") TransferUserDTO transferUser) throws RessourceNotFoundException, ImpossibleTransferException, AlreadyExistException {
+		LOGGER.info("POST - make a new transaction between users");
+		User user = userService.getCurrentUser();
+		try {
+			transactionUserService.newTransferWithUser(transferUser, user);
+		} catch(ImpossibleTransferException e) {
+			return "redirect:/transfer?error";
+		}
+		return "redirect:/transfer?success";
+	}
+	
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.payMyBuddy.app.exception.AlreadyExistException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.ImpossibleTransferException;
 
 /**
  * 
@@ -40,7 +41,22 @@ public class GlobalControllerExceptionHandler {
 	 * 
 	 */
 	@ExceptionHandler(AlreadyExistException.class)
-	public ResponseEntity<String> handletNotFoundException(AlreadyExistException ex) {
+	public ResponseEntity<String> handletAlreadyExistException(AlreadyExistException ex) {
+		String error = ex.getMessage();
+		// Logger
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+	}
+	
+	/**
+	 * Gêre l'erreur TransferImpossibleException.
+	 * 
+	 * @param Une erreur de type TransferImpossibleException.
+	 * 
+	 * @return response entity CONFLICT avec comme body une erreur.
+	 * 
+	 */
+	@ExceptionHandler(ImpossibleTransferException.class)
+	public ResponseEntity<String> handletImpossibleTransferException(ImpossibleTransferException ex) {
 		String error = ex.getMessage();
 		// Logger
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

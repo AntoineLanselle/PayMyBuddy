@@ -8,9 +8,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.payMyBuddy.app.DTO.TransferBankDTO;
 import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleTransferException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.TransactionBank;
+import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.repository.TransactionBankRepository;
 
 /**
@@ -25,6 +28,8 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 
 	@Autowired
 	private TransactionBankRepository transactionBankRepository;
+	@Autowired
+	private UserService userService;
 
 	/*
 	 * 
@@ -50,7 +55,7 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 	@Override
 	public TransactionBank addTransactionBank(TransactionBank transactionBank) throws AlreadyExistException {
 		LOGGER.info("Saving transaction between User and bank: " + transactionBank.getUser().getEmail() + " and "
-				+ transactionBank.getBankAccount());
+				+ transactionBank.getBankaccount());
 		return transactionBankRepository.save(transactionBank);
 	}
 
@@ -94,6 +99,56 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 		}
 		LOGGER.info("Deleting transaction between User and bank Id: " + id);
 		transactionBankRepository.deleteById(id);
+	}
+
+	@Override
+	public void transferOnBalance(TransferBankDTO transferBank, User user) throws AlreadyExistException, ImpossibleTransferException, RessourceNotFoundException {
+
+		TransactionBank transfer = new TransactionBank();
+
+		if (transferBank.getAmount() != 0 && transferBank.getBankAccount().length() > 0) {
+
+			transfer.setAmount(transferBank.getAmount());
+			transfer.setBankaccount(transferBank.getBankAccount());
+			transfer.setUser(user);
+
+			addTransactionBank(transfer);
+			user.setBalance(user.getBalance() + transferBank.getAmount());
+			user.getTransactionsBank().add(transfer);
+			userService.updateUser(user);
+			
+		} else {
+			String error = "Transfer on balance impossible";
+			LOGGER.error(error);
+			throw new ImpossibleTransferException(error);
+		}
+
+	}
+
+	@Override
+	public void transferOnBank(TransferBankDTO transferBank, User user) throws RessourceNotFoundException, AlreadyExistException, ImpossibleTransferException {
+		
+		TransactionBank transfer = new TransactionBank();
+		
+		if ( transferBank.getAmount() != 0 
+				&& transferBank.getBankAccount().length() > 0
+				&& (user.getBalance() - transferBank.getAmount() > 0) ) { 
+																			
+					transfer.setAmount(transferBank.getAmount());
+					transfer.setBankaccount(transferBank.getBankAccount());
+					transfer.setUser(user);
+					addTransactionBank(transfer);
+					
+					user.setBalance(user.getBalance() - transferBank.getAmount());
+					user.getTransactionsBank().add(transfer);
+					userService.updateUser(user);
+				
+		} else {
+			String error = "Transfer to Bank impossible";
+			LOGGER.error(error);
+			throw new ImpossibleTransferException(error);
+		}
+
 	}
 
 }

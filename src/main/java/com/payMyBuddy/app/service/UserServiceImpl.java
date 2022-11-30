@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.payMyBuddy.app.DTO.UserRegistrationDTO;
 import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleConnectionException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.repository.UserRepository;
@@ -117,15 +118,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User getCurrentUser() {  //-TODO : ça marche pas 
+	public User getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) { // auth n'est pas null, c'est bien
-			
+		if (auth != null) {
 			return userRepository.findByEmail(auth.getName());
 		}
-		// et je finis avec User null qui entraine un null pointer exception
-		// quand j essaye de recuperer des infos de l'User
-		return null; 
+		return null;
 	}
 
 	@Override
@@ -137,7 +135,7 @@ public class UserServiceImpl implements UserService {
 	public User findByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -162,6 +160,20 @@ public class UserServiceImpl implements UserService {
 					"connection between" + user.getEmail() + "and" + newConnection.getEmail() + "already exist");
 		}
 		user.getConnections().add(newConnection);
+	}
+
+	@Override
+	public void newConnection(User user, String email)
+			throws RessourceNotFoundException, ImpossibleConnectionException {
+		User newConnection = findByEmail(email);
+		if (newConnection != null && newConnection != user && !user.getConnections().contains(newConnection)) {
+			user.getConnections().add(newConnection);
+			updateUser(user);
+		} else {
+			String error = "Impossible to make connection between" + user.getEmail() + " and " + email + ".";
+			throw new ImpossibleConnectionException(error);
+		}
+
 	}
 
 }
