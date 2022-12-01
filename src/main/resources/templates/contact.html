@@ -55,17 +55,16 @@
 						<th colspan="2">Contact list</th>
 					</tr>
 					<tr>
-						<th>Id</th>
 						<th>Email</th>
+						<th>Suppr</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr th:each="user: ${users}">
-						<td name="id" th:text="${user.id}">id</td>
 						<td th:text="${user.email}">email</td>
 						<td>
 							<form method="POST" th:action="@{/deleteConnection}">
-								<button class="delete-connection" type="submit" name="id" th:value="${user.id}">X</button>
+								<button class="delete-connection" type="submit" name="email" th:value="${user.email}">X</button>
 							</form>
 						</td>
 					</tr>

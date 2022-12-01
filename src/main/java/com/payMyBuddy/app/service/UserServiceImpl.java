@@ -1,8 +1,6 @@
 package com.payMyBuddy.app.service;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,27 +39,16 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 */
 	@Override
-	public List<User> getUsers() {
-		LOGGER.info("Getting all Users");
-		return userRepository.findAll();
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public Optional<User> getUserById(Integer id) {
-		LOGGER.info("Getting User Id: " + id);
-		return userRepository.findById(id);
-	}
-
-	/**
-	 * 
-	 */
-	@Override
 	public User addUser(User user) throws AlreadyExistException {
-		LOGGER.info("Saving User: " + user.getEmail());
-		return userRepository.save(user);
+		if (existsByEmail(user.getEmail()) || user.getEmail().equals("")) {
+			String error = "User: " + user.getEmail() + " already exist.";
+			LOGGER.error(error);
+			throw new AlreadyExistException(error);
+		} else {
+			String info = "Adding in database User: " + user.getEmail();
+			LOGGER.info(info);
+			return userRepository.save(user);
+		}
 	}
 
 	/**
@@ -69,10 +56,10 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public User saveUser(UserRegistrationDTO userRegistration) throws AlreadyExistException {
-		LOGGER.info("Saving User: " + userRegistration.getEmail());
-
 		User user = new User(userRegistration.getEmail(), passwordEncoder.encode(userRegistration.getPassword()));
-		return userRepository.save(user);
+		String info = "Trying to save from registration page User: " + user.getEmail();
+		LOGGER.info(info);
+		return addUser(user);
 	}
 
 	/**
@@ -80,57 +67,41 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public User updateUser(User user) throws RessourceNotFoundException {
-		if (getUserById(user.getId()) == null) {
-			String error = "User: " + user.getEmail() + " not found";
+		if (!existsByEmail(user.getEmail())) {
+			String error = "User: " + user.getEmail() + " not found.";
 			LOGGER.error(error);
 			throw new RessourceNotFoundException(error);
+		} else {
+			String info = "Updating in database User: " + user.getEmail();
+			LOGGER.info(info);
+			return userRepository.save(user);
 		}
-		LOGGER.info("Updating User Id: " + user.getId());
-		return userRepository.save(user);
 	}
 
 	/**
 	 * 
 	 */
-	@Override
-	public void deleteUser(User user) throws RessourceNotFoundException {
-		if (getUserById(user.getId()) == null) {
-			String error = "User: " + user.getEmail() + " not found";
-			LOGGER.error(error);
-			throw new RessourceNotFoundException(error);
-		}
-		LOGGER.info("Deleting User Id: " + user.getId());
-		userRepository.delete(user);
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void deleteUser(Integer id) throws RessourceNotFoundException {
-		if (getUserById(id) == null) {
-			String error = "User: " + id + " not found";
-			LOGGER.error(error);
-			throw new RessourceNotFoundException(error);
-		}
-		LOGGER.info("Deleting User Id: " + id);
-		userRepository.deleteById(id);
-	}
-
 	@Override
 	public User getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
 			return userRepository.findByEmail(auth.getName());
+		} else {
+			return null;
 		}
-		return null;
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public Boolean existsByEmail(String email) {
 		return userRepository.existsByEmail(email);
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public User findByEmail(String email) {
 		return userRepository.findByEmail(email);
@@ -143,37 +114,31 @@ public class UserServiceImpl implements UserService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByEmail(username);
 		if (user == null) {
-			throw new UsernameNotFoundException(username + "not found");
+			String error = username + "not found";
+			throw new UsernameNotFoundException(error);
+		} else {
+			return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+					Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 		}
-		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-				Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 	}
 
+	/**
+	 * 
+	 */
 	@Override
-	public void saveConnection(User user, String email) throws RessourceNotFoundException, AlreadyExistException {
-		User newConnection = userRepository.findByEmail(email);
-		if (newConnection == null) {
-			throw new RessourceNotFoundException(email + "not found");
-		}
-		if (user.getConnections().contains(newConnection)) {
-			throw new AlreadyExistException(
-					"connection between" + user.getEmail() + "and" + newConnection.getEmail() + "already exist");
-		}
-		user.getConnections().add(newConnection);
-	}
-
-	@Override
-	public void newConnection(User user, String email)
+	public void saveConnection(User user, String email)
 			throws RessourceNotFoundException, ImpossibleConnectionException {
 		User newConnection = findByEmail(email);
-		if (newConnection != null && newConnection != user && !user.getConnections().contains(newConnection)) {
-			user.getConnections().add(newConnection);
-			updateUser(user);
-		} else {
+		if (newConnection == null || newConnection == user || user.getConnections().contains(newConnection)) {
 			String error = "Impossible to make connection between" + user.getEmail() + " and " + email + ".";
 			throw new ImpossibleConnectionException(error);
+		} else {
+			user.getConnections().add(newConnection);
+			updateUser(user);
 		}
 
 	}
+	
+	
 
 }

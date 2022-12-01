@@ -50,7 +50,7 @@ public class ContactController {
 		LOGGER.info("Add connection in database - " + email);
 		User user = userService.getCurrentUser();
 		try {
-			userService.newConnection(user, email);
+			userService.saveConnection(user, email);
 			return "redirect:/contact?sucess";
 		} catch(ImpossibleConnectionException e) {
 			return "redirect:/contact?error";
@@ -62,10 +62,10 @@ public class ContactController {
 	 * 
 	 */
 	@PostMapping("/deleteConnection")
-    public String deleteConnection(@RequestParam int id) throws RessourceNotFoundException { 
+    public String deleteConnection(@RequestParam String email) throws RessourceNotFoundException { 
     	User user = userService.getCurrentUser();
-    	LOGGER.info("Delete connection of " + user.getId() + " with " + id);
-    	user.getConnections().removeIf(connectionUser -> (connectionUser.getId() == id ));
+    	LOGGER.info("Delete connection of " + user.getId() + " with " + email);
+    	user.getConnections().removeIf(connectionUser -> (connectionUser.getEmail().equals(email)));
     	userService.updateUser(user);
         
         return "redirect:/contact";
