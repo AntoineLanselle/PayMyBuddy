@@ -18,4 +18,6 @@ public interface TransactionUserService {
 	public void newTransferWithUser(TransferUserDTO transferUserDTO, User user)
 			throws AlreadyExistException, RessourceNotFoundException, ImpossibleTransferException;
 
+	double calculateTax(double amount);
+
 }

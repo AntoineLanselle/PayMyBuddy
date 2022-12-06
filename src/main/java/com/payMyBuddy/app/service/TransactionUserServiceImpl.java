@@ -25,7 +25,7 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 	@Autowired
 	private TransactionUserRepository transactionUserRepository;
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	/*
 	 * 
@@ -49,32 +49,41 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 
 		// verify the transfer is valid
 		if (userReceiver != null && transferUserDTO.getAmount() > 0
-				&& (user.getBalance() - transferUserDTO.getAmount()) >= 0) {
+				&& (user.getBalance() - (transferUserDTO.getAmount() * 1.05)) >= 0) {
 
-			// create the new transfer
-			TransactionUser transferUser = new TransactionUser();
-			transferUser.setAmount(transferUserDTO.getAmount());
-			transferUser.setPayer(user);
-			transferUser.setReceiver(userReceiver);
-			transferUser.setDescription(transferUserDTO.getDescription());
-
-			// add the new transfer in database
-			user.getTransactionsUser().add(transferUser);
-			userReceiver.getTransactionsUser().add(transferUser);
+			// create the new transfer and add it in database
+			TransactionUser transferUser = new TransactionUser(user, userReceiver, transferUserDTO.getDescription(),
+					transferUserDTO.getAmount(), calculateTax(transferUserDTO.getAmount()));
 			addTransactionUser(transferUser);
 
 			// operations on the balance of users
-			user.setBalance(user.getBalance() - transferUserDTO.getAmount());
-			userReceiver.setBalance(userReceiver.getBalance() + transferUserDTO.getAmount());
-
+			User applicationAccount = userService.findByEmail("applicationBalance");
+			user.setBalance(user.getBalance() - (transferUser.getAmount() + transferUser.getTax()));
+			userReceiver.setBalance(userReceiver.getBalance() + transferUser.getAmount());
+			applicationAccount.setBalance(applicationAccount.getBalance() + transferUser.getTax());
+			
 			// update the changes
 			userService.updateUser(user);
 			userService.updateUser(userReceiver);
+			userService.updateUser(applicationAccount);
 
 		} else {
 			String error = "Transaction between users impossible";
 			LOGGER.error(error);
 			throw new ImpossibleTransferException(error);
+		}
+	}
+	
+	/*
+	 * 
+	 */
+	@Override
+	public double calculateTax(double amount) {
+		Double tax = Math.round(amount * 0.005 * 100.0) / 100.0;
+		if(tax > 0) {
+			return tax;
+		} else {
+			return 0.01;
 		}
 	}
 

@@ -1,6 +1,6 @@
 package com.payMyBuddy.app.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,14 +31,24 @@ public class TransactionBank {
 	private User user;
 
 	@Column(name = "date")
-	private Date date;
+	private LocalDateTime date;
 
 	@Column(name = "bankaccount")
 	private String bankaccount;
 
 	@Column(name = "amount")
-	private float amount;
+	private double amount;
 
+	public TransactionBank() {
+		this.date = LocalDateTime.now();
+	}
+	public TransactionBank(User user, String bankaccount, float amount) {
+		this.user = user;
+		this.date = LocalDateTime.now();
+		this.bankaccount = bankaccount;
+		this.amount = amount;
+	}
+	
 	/**
 	 * @return the id
 	 */
@@ -70,14 +80,14 @@ public class TransactionBank {
 	/**
 	 * @return the date
 	 */
-	public Date getDate() {
+	public LocalDateTime getDate() {
 		return date;
 	}
 
 	/**
 	 * @param date the date to set
 	 */
-	public void setDate(Date date) {
+	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 
@@ -98,14 +108,14 @@ public class TransactionBank {
 	/**
 	 * @return the amount
 	 */
-	public float getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
 	/**
 	 * @param amount the amount to set
 	 */
-	public void setAmount(float amount) {
+	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 

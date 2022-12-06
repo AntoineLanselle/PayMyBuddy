@@ -36,7 +36,7 @@ public class User {
 	private String password;
 
 	@Column(name = "balance")
-	private float balance;
+	private double balance;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -45,8 +45,11 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "connection_id"))
 	  private List<User> connections = new ArrayList<>();
 
-	@OneToMany(mappedBy = "payer", fetch = FetchType.LAZY)
-	private List<TransactionUser> transactionsUser = new ArrayList<>();
+	@OneToMany(mappedBy = "payer", fetch = FetchType.LAZY) 
+	private List<TransactionUser> transactionsPayer = new ArrayList<>();
+	
+	@ManyToMany(mappedBy = "receiver", fetch = FetchType.LAZY) 
+	private List<TransactionUser> transactionsReceiver = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<TransactionBank> transactionsBank = new ArrayList<>();
@@ -105,14 +108,14 @@ public class User {
 	/**
 	 * @return the balance
 	 */
-	public float getBalance() {
+	public double getBalance() {
 		return balance;
 	}
 
 	/**
 	 * @param balance the balance to set
 	 */
-	public void setBalance(float balance) {
+	public void setBalance(double balance) {
 		this.balance = balance;
 	}
 
@@ -133,15 +136,29 @@ public class User {
 	/**
 	 * @return the transactionsUser
 	 */
-	public List<TransactionUser> getTransactionsUser() {
-		return transactionsUser;
+	public List<TransactionUser> getTransactionsPayer() {
+		return transactionsPayer;
 	}
 
 	/**
 	 * @param transactionsUser the transactionsUser to set
 	 */
-	public void setTransactionsUser(List<TransactionUser> transactionsUser) {
-		this.transactionsUser = transactionsUser;
+	public void setTransactionsPayer(List<TransactionUser> transactionsUser) {
+		this.transactionsPayer = transactionsUser;
+	}
+	
+	/**
+	 * @return the transactionsUser
+	 */
+	public List<TransactionUser> getTransactionsReceiver() {
+		return transactionsReceiver;
+	}
+
+	/**
+	 * @param transactionsUser the transactionsUser to set
+	 */
+	public void setTransactionsReceiver(List<TransactionUser> transactionsUser) {
+		this.transactionsReceiver = transactionsUser;
 	}
 
 	/**

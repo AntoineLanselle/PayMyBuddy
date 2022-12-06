@@ -1,6 +1,6 @@
 package com.payMyBuddy.app.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,14 +35,32 @@ public class TransactionUser {
 	private User receiver;
 
 	@Column(name = "date")
-	private Date date;
+	private LocalDateTime date;
 
 	@Column(name = "description")
 	private String description;
 
 	@Column(name = "amount")
-	private float amount;
+	private double amount;
+	
+	@Column(name = "tax")
+	private double tax;
 
+	public TransactionUser() {
+		this.date = LocalDateTime.now();
+		this.amount = 0;
+		this.tax = 0;
+	}
+	
+	public TransactionUser(User payer, User receiver, String description, double amount, double tax) {
+		this.payer = payer;
+		this.receiver = receiver;
+		this.date = LocalDateTime.now();
+		this.description = description;
+		this.amount = amount;
+		this.tax = tax;
+	}
+	
 	/**
 	 * @return the id
 	 */
@@ -88,14 +106,14 @@ public class TransactionUser {
 	/**
 	 * @return the date
 	 */
-	public Date getDate() {
+	public LocalDateTime getDate() {
 		return date;
 	}
 
 	/**
 	 * @param date the date to set
 	 */
-	public void setDate(Date date) {
+	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 
@@ -116,15 +134,31 @@ public class TransactionUser {
 	/**
 	 * @return the amount
 	 */
-	public float getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
 	/**
 	 * @param amount the amount to set
 	 */
-	public void setAmount(float amount) {
+	public void setAmount(double amount) {
 		this.amount = amount;
 	}
+
+	/**
+	 * @return the tax
+	 */
+	public double getTax() {
+		return tax;
+	}
+
+	/**
+	 * @param tax the tax to set
+	 */
+	public void setTax(double tax) {
+		this.tax = tax;
+	}
+	
+	
 	
 }

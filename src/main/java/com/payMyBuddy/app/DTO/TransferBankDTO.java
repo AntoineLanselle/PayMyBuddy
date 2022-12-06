@@ -5,9 +5,6 @@ public class TransferBankDTO {
 	private String bankaccount;
 	private float amount;
 	
-	public TransferBankDTO() {
-	}
-	
 	public TransferBankDTO(String bankaccount, Float amount) {
 		this.bankaccount = bankaccount;
 		this.amount = amount;

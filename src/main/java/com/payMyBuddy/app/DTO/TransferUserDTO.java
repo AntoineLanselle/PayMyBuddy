@@ -5,10 +5,7 @@ public class TransferUserDTO {
 	private String receiver;
 	private String description;
 	private float amount;
-	
-	public TransferUserDTO() {
-	}
-	
+
 	public TransferUserDTO(String receiver, String description, float amount) {
 		this.receiver = receiver;
 		this.description = description;

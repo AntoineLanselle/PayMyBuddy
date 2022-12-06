@@ -47,14 +47,10 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 
 		if (transferBank.getAmount() != 0 && transferBank.getBankAccount().length() > 0) {
 
-			TransactionBank transfer = new TransactionBank();
-			transfer.setAmount(transferBank.getAmount());
-			transfer.setBankaccount(transferBank.getBankAccount());
-			transfer.setUser(user);
-
+			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(), transferBank.getAmount());
 			addTransactionBank(transfer);
+
 			user.setBalance(user.getBalance() + transferBank.getAmount());
-			user.getTransactionsBank().add(transfer);
 			userService.updateUser(user);
 
 		} else {
@@ -74,14 +70,10 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 		if (transferBank.getAmount() > 0 && transferBank.getBankAccount().length() > 0
 				&& (user.getBalance() - transferBank.getAmount() > 0)) {
 
-			TransactionBank transfer = new TransactionBank();
-			transfer.setAmount(transferBank.getAmount());
-			transfer.setBankaccount(transferBank.getBankAccount());
-			transfer.setUser(user);
+			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(), -transferBank.getAmount());
 			addTransactionBank(transfer);
 
 			user.setBalance(user.getBalance() - transferBank.getAmount());
-			user.getTransactionsBank().add(transfer);
 			userService.updateUser(user);
 
 		} else {
