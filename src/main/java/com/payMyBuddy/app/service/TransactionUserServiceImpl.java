@@ -1,5 +1,8 @@
 package com.payMyBuddy.app.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +52,7 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 
 		// verify the transfer is valid
 		if (userReceiver != null && transferUserDTO.getAmount() > 0
-				&& (user.getBalance() - (transferUserDTO.getAmount() * 1.05)) >= 0) {
+				&& (user.getBalance() - (transferUserDTO.getAmount() * 1.005)) >= 0) {
 
 			// create the new transfer and add it in database
 			TransactionUser transferUser = new TransactionUser(user, userReceiver, transferUserDTO.getDescription(),
@@ -79,11 +82,44 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 	 */
 	@Override
 	public double calculateTax(double amount) {
-		Double tax = Math.round(amount * 0.005 * 100.0) / 100.0;
+		Double tax = ((double)((int)(amount*0.005*100)))/100;
 		if(tax > 0) {
 			return tax;
 		} else {
 			return 0.01;
+		}
+	}
+
+	@Override
+	public List<TransactionUser> getPagination(int page, int size, User user) {
+		List<TransactionUser> pageTransfers = new ArrayList<TransactionUser>();
+		pageTransfers.addAll(user.getTransactionsPayer());
+		pageTransfers.addAll(user.getTransactionsReceiver());
+		
+		if(pageTransfers.size() >= ((page*size)+size)) {
+			return pageTransfers.subList(page*size, (page*size)+size);
+		} else {
+			List<TransactionUser> pageLastTransfers = new ArrayList<TransactionUser>();
+			int reste = pageTransfers.size()-(page*size);
+			for(int i=0; i < reste; i++) {
+				pageLastTransfers.add(pageTransfers.get(pageTransfers.size()-reste+i));
+			}
+			return pageLastTransfers;
+		}
+
+	}
+
+	@Override
+	public int getPageNumber(int pageSize, User user) {
+		List<TransactionUser> pageTransfers = new ArrayList<TransactionUser>();
+		pageTransfers.addAll(user.getTransactionsPayer());
+		pageTransfers.addAll(user.getTransactionsReceiver());
+		
+		int number = pageTransfers.size()/pageSize;
+		if(number*pageSize < pageTransfers.size()) {
+			return number+1;
+		} else {
+			return number;
 		}
 	}
 

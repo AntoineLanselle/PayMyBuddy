@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 */
 	@Override
-	public void saveConnection(User user, String email)
+	public User saveConnection(User user, String email)
 			throws RessourceNotFoundException, ImpossibleConnectionException {
 		User newConnection = findByEmail(email);
 		if (newConnection == null || newConnection == user || user.getConnections().contains(newConnection)) {
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
 			throw new ImpossibleConnectionException(error);
 		} else {
 			user.getConnections().add(newConnection);
-			updateUser(user);
+			return updateUser(user);
 		}
 
 	}

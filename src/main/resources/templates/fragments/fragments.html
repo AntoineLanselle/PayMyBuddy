@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http:///www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+<meta charset="utf-8">
+<title>PayMyBuddy - Contact</title>
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+	<nav th:fragment="navigation">
+		<ul>
+			<li><span><a href="/" th:href="@{/index}">Home</a></span></li>
+			<li><span><a href="/transfer" th:href="@{/transfer}">Transfer</a></span></li>
+			<li><span><a href="/profile" th:href="@{/profile}">Profile</a></span></li>
+			<li><span><a href="/contact" th:href="@{/contact}">Contact</a></span></li>
+			<li><span sec:authorize="isAuthenticated()"><a
+					th:href="@{/logout}">Log off</a></span></li>
+		</ul>
+	</nav>
+
+
+	<nav th:fragment="paged">
+		<ul>
+			<li class="page-item"><a class="page-link" href="#"
+				aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+			</a></li>
+			<li class="page-item"><a class="page-link" href="#">1</a></li>
+			<li class="page-item"><a class="page-link" href="#">2</a></li>
+			<li class="page-item"><a class="page-link" href="#">3</a></li>
+			<li class="page-item"><a class="page-link" href="#"
+				aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+			</a></li>
+		</ul>
+	</nav>
+
+	<div class="footer" th:fragment="footer">
+		<span> footer here </span>
+	</div>
+
+</body>
+
+</html>

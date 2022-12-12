@@ -42,7 +42,7 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 	 * 
 	 */
 	@Override
-	public void transferOnBalance(TransferBankDTO transferBank, User user)
+	public User transferOnBalance(TransferBankDTO transferBank, User user)
 			throws ImpossibleTransferException, RessourceNotFoundException {
 
 		if (transferBank.getAmount() != 0 && transferBank.getBankAccount().length() > 0) {
@@ -51,7 +51,7 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 			addTransactionBank(transfer);
 
 			user.setBalance(user.getBalance() + transferBank.getAmount());
-			userService.updateUser(user);
+			return userService.updateUser(user);
 
 		} else {
 			String error = "Transfer on balance impossible";
@@ -64,17 +64,17 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 	 * 
 	 */
 	@Override
-	public void transferOnBank(TransferBankDTO transferBank, User user)
+	public User transferOnBank(TransferBankDTO transferBank, User user)
 			throws RessourceNotFoundException, ImpossibleTransferException {
 
 		if (transferBank.getAmount() > 0 && transferBank.getBankAccount().length() > 0
-				&& (user.getBalance() - transferBank.getAmount() > 0)) {
+				&& (user.getBalance() - transferBank.getAmount() >= 0)) {
 
 			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(), -transferBank.getAmount());
 			addTransactionBank(transfer);
 
 			user.setBalance(user.getBalance() - transferBank.getAmount());
-			userService.updateUser(user);
+			return userService.updateUser(user);
 
 		} else {
 			String error = "Transfer to Bank impossible";

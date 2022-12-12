@@ -2,14 +2,8 @@ package com.payMyBuddy.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,126 +16,97 @@ import com.payMyBuddy.app.exception.RessourceNotFoundException;
 import com.payMyBuddy.app.model.TransactionBank;
 import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.repository.TransactionBankRepository;
-import com.payMyBuddy.app.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class TransactionBankServiceImplTest {
-	
+
 	@Mock
 	private TransactionBankRepository transactionBankRepository;
 	@Mock
-	private UserRepository userRepository;
+	private UserService userService;
 	@InjectMocks
 	private TransactionBankServiceImpl transactionBankServiceImpl;
-	
-	static List<TransactionBank> listAllTransfer;
-	/*
-	@BeforeAll
-	public static void init() {
-		listAllTransfer = new ArrayList<TransactionBank>();
 
-		TransactionBank transactionOne = new TransactionBank();
-		TransactionBank transactionTwo = new TransactionBank();
-		TransactionBank transactionThree = new TransactionBank();
-		TransactionBank transactionFore = new TransactionBank();
-		TransactionBank transactionFive = new TransactionBank();
-		
-		listAllTransfer.add(transactionOne);
-		listAllTransfer.add(transactionTwo);
-		listAllTransfer.add(transactionThree);
-		listAllTransfer.add(transactionFore);
-		listAllTransfer.add(transactionFive);
-	}
-	
 	@Test
-	public void addTransactionBank_ShouldAddTransactionInParameterInRepository() {
+	public void addTransactionBank_ShouldReturnTrasactionBank() {
 		// GIVEN
-		TransactionBank transactionBank = new TransactionBank();
-
 		User user = new User("userTest@gmail.com", "userTest");
-		
-		transactionBank.setAmount(100);
-		transactionBank.setBankaccount("bankAccount");
-		transactionBank.setUser(user);
-		
+		TransactionBank transactionBank = new TransactionBank(user, "account", 1);
 		when(transactionBankRepository.save(transactionBank)).thenReturn(transactionBank);
-		
+
 		// WHEN
-		
+		TransactionBank result = transactionBankServiceImpl.addTransactionBank(transactionBank);
+
 		// THEN
-		assertEquals(transactionBank, transactionBankServiceImpl.addTransactionBank(transactionBank));
+		assertEquals(transactionBank, result);
 	}
-	
+
 	@Test
-	public void transferOnBalance_ShouldAddAmountInUserBalance() throws ImpossibleTransferException, RessourceNotFoundException {
+	public void transferOnBalance_ShouldReturnUser() throws ImpossibleTransferException, RessourceNotFoundException {
 		// GIVEN
-		TransferBankDTO transferBankDTO = new TransferBankDTO();
-		transferBankDTO.setAmount(100);
-		transferBankDTO.setBankAccount("bankAccount");
-		
 		User user = new User("userTest@gmail.com", "userTest");
-		user.setBalance(0);
-		
-		TransactionBank transactionBank = new TransactionBank();
-		transactionBank.setAmount(100);
-		transactionBank.setBankaccount("bankAccount");
-		transactionBank.setUser(user);
-
-		when(transactionBankRepository.save(transactionBank)).thenReturn(transactionBank);
-		when(userRepository.save(user)).thenReturn(user);
+		TransferBankDTO transferBankDTO = new TransferBankDTO("bankAccount", 100);
+		when(userService.updateUser(user)).thenReturn(user);
 
 		// WHEN
-		transactionBankServiceImpl.transferOnBalance(transferBankDTO, user);
-		
+		User result = transactionBankServiceImpl.transferOnBalance(transferBankDTO, user);
+
 		// THEN
-		verify(userRepository, times(1)).save(user);
-		verify(transactionBankRepository, times(1)).save(transactionBank);
+		assertEquals(user, result);
 	}
-	
+
 	@Test
-	public void transferOnBalance_ShouldThrowImpossibleTransferException() throws ImpossibleTransferException, RessourceNotFoundException {
+	public void transferOnBalance_ShouldThrowImpossibleTransferException()
+			throws ImpossibleTransferException, RessourceNotFoundException {
 		// GIVEN
-		TransferBankDTO transferBankDTOOne = new TransferBankDTO();
-		transferBankDTOOne.setAmount(100);
-		transferBankDTOOne.setBankAccount(""); //bank account not pute by user
-		
-		TransferBankDTO transferBankDTOTwo = new TransferBankDTO();
-		transferBankDTOTwo.setAmount(0); //amount not pute by user
-		transferBankDTOTwo.setBankAccount("bankAccount");
-		
 		User user = new User("userTest@gmail.com", "userTest");
-
-		// WHEN
+		TransferBankDTO transferOne = new TransferBankDTO("", 100);
+		TransferBankDTO transferTwo = new TransferBankDTO("bankAccount", 0);
 		
-		// THEN
-		assertThrows(ImpossibleTransferException.class, () -> {transactionBankServiceImpl.transferOnBalance(transferBankDTOOne, user);});
-		assertThrows(ImpossibleTransferException.class, () -> {transactionBankServiceImpl.transferOnBalance(transferBankDTOTwo, user);});
+		// WHEN // THEN
+		assertThrows(ImpossibleTransferException.class, () -> {
+			transactionBankServiceImpl.transferOnBalance(transferOne, user);
+		});
+		assertThrows(ImpossibleTransferException.class, () -> {
+			transactionBankServiceImpl.transferOnBalance(transferTwo, user);
+		});
 	}
-	
+
 	@Test
-	public void transferOnBank_ShouldThrowImpossibleTransferException() throws ImpossibleTransferException, RessourceNotFoundException {
+	public void transferOnBank_ShouldReturnUser() throws ImpossibleTransferException, RessourceNotFoundException {
 		// GIVEN
-		TransferBankDTO transferBankDTOOne = new TransferBankDTO();
-		transferBankDTOOne.setAmount(100);
-		transferBankDTOOne.setBankAccount(""); //bank account not pute by user
-		
-		TransferBankDTO transferBankDTOTwo = new TransferBankDTO();
-		transferBankDTOTwo.setAmount(0); //amount not pute by user
-		transferBankDTOTwo.setBankAccount("bankAccount");
-		
-		TransferBankDTO transferBankDTOThree = new TransferBankDTO();
-		transferBankDTOThree.setAmount(100); //amount bigger than user balance
-		transferBankDTOThree.setBankAccount("bankAccount");
-		
 		User user = new User("userTest@gmail.com", "userTest");
-		user.setBalance(20);
+		user.setBalance(50);
+		TransferBankDTO transferBankDTO = new TransferBankDTO("bankAccount", 50);
+		when(userService.updateUser(user)).thenReturn(user);
 
 		// WHEN
-		
+		User result = transactionBankServiceImpl.transferOnBank(transferBankDTO, user);
+
 		// THEN
-		assertThrows(ImpossibleTransferException.class, () -> {transactionBankServiceImpl.transferOnBank(transferBankDTOOne, user);});
-		assertThrows(ImpossibleTransferException.class, () -> {transactionBankServiceImpl.transferOnBank(transferBankDTOTwo, user);});
-		assertThrows(ImpossibleTransferException.class, () -> {transactionBankServiceImpl.transferOnBank(transferBankDTOThree, user);});
+		assertEquals(user, result);
 	}
-	*/
+
+	@Test
+	public void transferOnBank_ShouldThrowImpossibleTransferException()
+			throws ImpossibleTransferException, RessourceNotFoundException {
+		// GIVEN
+		User user = new User("userTest@gmail.com", "userTest");
+		user.setBalance(10);
+		TransferBankDTO transferOne = new TransferBankDTO("", 5);
+		TransferBankDTO transferTwo = new TransferBankDTO("bankAccount", 0);
+		TransferBankDTO transferThree = new TransferBankDTO("bankAccount", 20);
+		
+		// WHEN // THEN
+		assertThrows(ImpossibleTransferException.class, () -> {
+			transactionBankServiceImpl.transferOnBank(transferOne, user);
+		});
+		assertThrows(ImpossibleTransferException.class, () -> {
+			transactionBankServiceImpl.transferOnBank(transferTwo, user);
+		});
+		assertThrows(ImpossibleTransferException.class, () -> {
+			transactionBankServiceImpl.transferOnBank(transferThree, user);
+		});
+	}
+
 }

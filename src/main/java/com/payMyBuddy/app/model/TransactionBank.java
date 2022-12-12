@@ -42,7 +42,7 @@ public class TransactionBank {
 	public TransactionBank() {
 		this.date = LocalDateTime.now();
 	}
-	public TransactionBank(User user, String bankaccount, float amount) {
+	public TransactionBank(User user, String bankaccount, double amount) {
 		this.user = user;
 		this.date = LocalDateTime.now();
 		this.bankaccount = bankaccount;

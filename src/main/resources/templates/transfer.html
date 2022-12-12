@@ -90,22 +90,42 @@
 						<div th:if="${user.email == transfer.receiver.email}">
 							<td th:text="${transfer.payer.email}" />
 							<td th:text="${transfer.description}" />
-							<td style="color: green">+<span th:text="${transfer.amount}" />€
-							</td>
-							<!-- ajouter signe + -->
+							<td style="color: green">+<span th:text="${transfer.amount}" />€</td>
 							<td th:text="${transfer.date}" />
 						</div>
 						<div th:unless="${user.email == transfer.receiver.email}">
 							<td th:text="${transfer.receiver.email}" />
 							<td th:text="${transfer.description}" />
-							<td style="color: red">-<span th:text="${transfer.amount}" />€
-							</td>
-							<!-- ajouter signe - -->
+							<td style="color: red">-<span th:text="${transfer.amount}" />€</td>
 							<td th:text="${transfer.date}" />
 						</div>
 					</tr>
 				</tbody>
 			</table>
+
+			<nav  th:if="${pageNumber > 1}">
+				<ul>
+				
+					<li class="page-item" th:if="${page > 0}">
+						<a class="page-link" th:href="@{'?page=' + ${page - 1}}" aria-label="Previous"> 
+							<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+					
+					<th:block th:each="page : ${#numbers.sequence(1, pageNumber)}">
+						<li class="page-item">
+							<a class="page-link" th:href="@{'?page=' + ${page - 1}}" th:text="${page}"></a>
+						</li>
+					</th:block>
+					
+					<li class="page-item">
+						<a class="page-link" href="#" aria-label="Next"> 
+							<span aria-hidden="true">&raquo;</span>
+						</a>
+					</li>
+					
+				</ul>
+			</nav>
 
 		</div>
 

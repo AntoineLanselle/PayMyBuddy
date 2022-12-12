@@ -4,9 +4,9 @@ public class TransferUserDTO {
 
 	private String receiver;
 	private String description;
-	private float amount;
+	private double amount;
 
-	public TransferUserDTO(String receiver, String description, float amount) {
+	public TransferUserDTO(String receiver, String description, double amount) {
 		this.receiver = receiver;
 		this.description = description;
 		this.amount = amount;
@@ -43,14 +43,14 @@ public class TransferUserDTO {
 	/**
 	 * @return the amount
 	 */
-	public float getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
 	/**
 	 * @param amount the amount to set
 	 */
-	public void setAmount(float amount) {
+	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 	

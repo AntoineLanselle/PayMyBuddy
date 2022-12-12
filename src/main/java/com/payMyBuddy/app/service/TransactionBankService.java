@@ -15,10 +15,10 @@ public interface TransactionBankService {
 
 	public TransactionBank addTransactionBank(TransactionBank transactionBank) throws AlreadyExistException;
 
-	public void transferOnBalance(TransferBankDTO transferBank, User user)
+	public User transferOnBalance(TransferBankDTO transferBank, User user)
 			throws ImpossibleTransferException, RessourceNotFoundException;
 
-	public void transferOnBank(TransferBankDTO transferBank, User user)
+	public User transferOnBank(TransferBankDTO transferBank, User user)
 			throws RessourceNotFoundException, ImpossibleTransferException;
 
 }

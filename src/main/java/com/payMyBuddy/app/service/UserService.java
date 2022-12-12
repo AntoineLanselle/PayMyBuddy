@@ -30,6 +30,6 @@ public interface UserService extends UserDetailsService {
 
 	public Boolean existsByEmail(String email);
 
-	public void saveConnection(User user, String email) throws ImpossibleConnectionException, RessourceNotFoundException;
+	public User saveConnection(User user, String email) throws ImpossibleConnectionException, RessourceNotFoundException;
 
 }

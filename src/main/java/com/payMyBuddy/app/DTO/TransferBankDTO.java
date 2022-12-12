@@ -3,9 +3,9 @@ package com.payMyBuddy.app.DTO;
 public class TransferBankDTO {
 
 	private String bankaccount;
-	private float amount;
+	private double amount;
 	
-	public TransferBankDTO(String bankaccount, Float amount) {
+	public TransferBankDTO(String bankaccount, double amount) {
 		this.bankaccount = bankaccount;
 		this.amount = amount;
 	}
@@ -27,14 +27,14 @@ public class TransferBankDTO {
 	/**
 	 * 
 	 */
-	public float getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
 	/**
 	 * 
 	 */
-	public void setAmount(float amount) {
+	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 	

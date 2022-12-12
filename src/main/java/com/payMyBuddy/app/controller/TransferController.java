@@ -1,6 +1,5 @@
 package com.payMyBuddy.app.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.payMyBuddy.app.DTO.TransferUserDTO;
 import com.payMyBuddy.app.exception.AlreadyExistException;
@@ -37,18 +37,20 @@ public class TransferController {
 	 * 
 	 */
 	@GetMapping
-	public String getTransferPage(Model model) {
+	public String getTransferPage(Model model, @RequestParam(required=false) Integer page, @RequestParam(required=false) Integer size) {
 
 		LOGGER.info("GET - transfer page");
 
+        int currentPage = page == null ? 0 : page;
+        int pageSize = size == null ? 3 : size;
+		 
 		User user = userService.getCurrentUser();
-
-		List<TransactionUser> transactions = new ArrayList<TransactionUser>();
-		transactions.addAll(user.getTransactionsPayer());
-		transactions.addAll(user.getTransactionsReceiver());
+		List<TransactionUser> transfers = transactionUserService.getPagination(currentPage, pageSize, user);
+		int pageNumber = transactionUserService.getPageNumber(pageSize, user);
 
 		model.addAttribute("user", user);
-		model.addAttribute("transfers", transactions);
+		model.addAttribute("transfers", transfers);
+		model.addAttribute("pageNumber", pageNumber);
 
 		return "transfer";
 	}
