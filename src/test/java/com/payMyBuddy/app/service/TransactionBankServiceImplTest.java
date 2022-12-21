@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.payMyBuddy.app.DTO.TransferBankDTO;
 import com.payMyBuddy.app.exception.ImpossibleTransferException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
 import com.payMyBuddy.app.model.TransactionBank;
 import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.repository.TransactionBankRepository;
@@ -42,7 +43,8 @@ public class TransactionBankServiceImplTest {
 	}
 
 	@Test
-	public void transferOnBalance_ShouldReturnUser() throws ImpossibleTransferException, RessourceNotFoundException {
+	public void transferOnBalance_ShouldReturnUser()
+			throws ImpossibleTransferException, RessourceNotFoundException, TransactionFailedException {
 		// GIVEN
 		User user = new User("userTest@gmail.com", "userTest");
 		TransferBankDTO transferBankDTO = new TransferBankDTO("bankAccount", 100);
@@ -62,7 +64,7 @@ public class TransactionBankServiceImplTest {
 		User user = new User("userTest@gmail.com", "userTest");
 		TransferBankDTO transferOne = new TransferBankDTO("", 100);
 		TransferBankDTO transferTwo = new TransferBankDTO("bankAccount", 0);
-		
+
 		// WHEN // THEN
 		assertThrows(ImpossibleTransferException.class, () -> {
 			transactionBankServiceImpl.transferOnBalance(transferOne, user);
@@ -73,7 +75,8 @@ public class TransactionBankServiceImplTest {
 	}
 
 	@Test
-	public void transferOnBank_ShouldReturnUser() throws ImpossibleTransferException, RessourceNotFoundException {
+	public void transferOnBank_ShouldReturnUser()
+			throws ImpossibleTransferException, RessourceNotFoundException, TransactionFailedException {
 		// GIVEN
 		User user = new User("userTest@gmail.com", "userTest");
 		user.setBalance(50);
@@ -96,7 +99,7 @@ public class TransactionBankServiceImplTest {
 		TransferBankDTO transferOne = new TransferBankDTO("", 5);
 		TransferBankDTO transferTwo = new TransferBankDTO("bankAccount", 0);
 		TransferBankDTO transferThree = new TransferBankDTO("bankAccount", 20);
-		
+
 		// WHEN // THEN
 		assertThrows(ImpossibleTransferException.class, () -> {
 			transactionBankServiceImpl.transferOnBank(transferOne, user);

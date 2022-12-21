@@ -73,16 +73,13 @@
 
 			</form>
 
+			<span>My Transactions</span>
 			<table>
 				<thead>
-					<tr>
-						<th colspan="4">Transfer with Users</th>
-					</tr>
 					<tr>
 						<th>Connections</th>
 						<th>Description</th>
 						<th>Amount</th>
-						<th>Date</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -91,35 +88,39 @@
 							<td th:text="${transfer.payer.email}" />
 							<td th:text="${transfer.description}" />
 							<td style="color: green">+<span th:text="${transfer.amount}" />€</td>
-							<td th:text="${transfer.date}" />
 						</div>
 						<div th:unless="${user.email == transfer.receiver.email}">
 							<td th:text="${transfer.receiver.email}" />
 							<td th:text="${transfer.description}" />
 							<td style="color: red">-<span th:text="${transfer.amount}" />€</td>
-							<td th:text="${transfer.date}" />
 						</div>
 					</tr>
 				</tbody>
 			</table>
 
-			<nav  th:if="${pageNumber > 1}">
+			<nav  th:if="${totalPageNumber > 1}">
 				<ul>
 				
-					<li class="page-item" th:if="${page > 0}">
-						<a class="page-link" th:href="@{'?page=' + ${page - 1}}" aria-label="Previous"> 
+					<li class="page-item">
+						<a class="page-link" th:if="${pageNumber > 0}" th:href="@{'?page=' + ${pageNumber - 1}}" aria-label="Previous"> 
 							<span aria-hidden="true">&laquo;</span>
+						</a>
+						<a th:unless="${pageNumber > 0}" style="color: grey">
+							<span aria-hidden="true" >&laquo;</span>
 						</a>
 					</li>
 					
-					<th:block th:each="page : ${#numbers.sequence(1, pageNumber)}">
+					<th:block th:each="page : ${#numbers.sequence(1, totalPageNumber)}">
 						<li class="page-item">
 							<a class="page-link" th:href="@{'?page=' + ${page - 1}}" th:text="${page}"></a>
 						</li>
 					</th:block>
 					
 					<li class="page-item">
-						<a class="page-link" href="#" aria-label="Next"> 
+						<a class="page-link" th:if="${pageNumber < totalPageNumber-1}" th:href="@{'?page=' + ${pageNumber + 1}}" aria-label="Next"> 
+							<span aria-hidden="true">&raquo;</span>
+						</a>
+						<a th:unless="${pageNumber < totalPageNumber-1}" style="color: grey">
 							<span aria-hidden="true">&raquo;</span>
 						</a>
 					</li>

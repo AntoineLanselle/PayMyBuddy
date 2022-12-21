@@ -48,7 +48,7 @@ public class User {
 	@OneToMany(mappedBy = "payer", fetch = FetchType.LAZY) 
 	private List<TransactionUser> transactionsPayer = new ArrayList<>();
 	
-	@ManyToMany(mappedBy = "receiver", fetch = FetchType.LAZY) 
+	@OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY) 
 	private List<TransactionUser> transactionsReceiver = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

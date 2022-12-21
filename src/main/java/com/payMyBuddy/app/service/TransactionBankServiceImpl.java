@@ -1,5 +1,7 @@
 package com.payMyBuddy.app.service;
 
+import javax.transaction.Transactional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.payMyBuddy.app.DTO.TransferBankDTO;
 import com.payMyBuddy.app.exception.ImpossibleTransferException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
 import com.payMyBuddy.app.model.TransactionBank;
 import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.repository.TransactionBankRepository;
@@ -42,16 +45,22 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 	 * 
 	 */
 	@Override
+	@Transactional(rollbackOn = TransactionFailedException.class)
 	public User transferOnBalance(TransferBankDTO transferBank, User user)
-			throws ImpossibleTransferException, RessourceNotFoundException {
+			throws ImpossibleTransferException, RessourceNotFoundException, TransactionFailedException {
 
 		if (transferBank.getAmount() != 0 && transferBank.getBankAccount().length() > 0) {
 
-			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(), transferBank.getAmount());
+			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(),
+					transferBank.getAmount());
 			addTransactionBank(transfer);
 
-			user.setBalance(user.getBalance() + transferBank.getAmount());
-			return userService.updateUser(user);
+			try {
+				user.setBalance(user.getBalance() + transferBank.getAmount());
+				return userService.updateUser(user);
+			} catch (Exception e) {
+				throw new TransactionFailedException("Transaction failed can not join database.");
+			}
 
 		} else {
 			String error = "Transfer on balance impossible";
@@ -64,17 +73,23 @@ public class TransactionBankServiceImpl implements TransactionBankService {
 	 * 
 	 */
 	@Override
+	@Transactional(rollbackOn = TransactionFailedException.class)
 	public User transferOnBank(TransferBankDTO transferBank, User user)
-			throws RessourceNotFoundException, ImpossibleTransferException {
+			throws RessourceNotFoundException, ImpossibleTransferException, TransactionFailedException {
 
 		if (transferBank.getAmount() > 0 && transferBank.getBankAccount().length() > 0
 				&& (user.getBalance() - transferBank.getAmount() >= 0)) {
 
-			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(), -transferBank.getAmount());
+			TransactionBank transfer = new TransactionBank(user, transferBank.getBankAccount(),
+					-transferBank.getAmount());
 			addTransactionBank(transfer);
 
-			user.setBalance(user.getBalance() - transferBank.getAmount());
-			return userService.updateUser(user);
+			try {
+				user.setBalance(user.getBalance() - transferBank.getAmount());
+				return userService.updateUser(user);
+			} catch (Exception e) {
+				throw new TransactionFailedException("Transaction failed can not join database.");
+			}
 
 		} else {
 			String error = "Transfer to Bank impossible";

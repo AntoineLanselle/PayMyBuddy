@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +19,10 @@ import com.payMyBuddy.app.DTO.TransferUserDTO;
 import com.payMyBuddy.app.exception.AlreadyExistException;
 import com.payMyBuddy.app.exception.ImpossibleTransferException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
 import com.payMyBuddy.app.model.TransactionUser;
 import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.service.PaginationService;
 import com.payMyBuddy.app.service.TransactionUserService;
 import com.payMyBuddy.app.service.UserService;
 
@@ -30,17 +33,21 @@ public class TransferControllerTest {
 	private TransactionUserService transactionUserService;
 	@Mock
 	private UserService userService;
+	@Mock
+	private PaginationService paginationService;
 	@InjectMocks
 	private TransferController transferController;
-	
+
 	@Test
 	public void getHomePage_ShouldReturnHomePageWithNullPagination() {
-		// GIVEN	
+		// GIVEN
 		Model m = new ExtendedModelMap();
 		User user = new User("user@gmail.com", "user");
+		List<TransactionUser> listTransactions = new ArrayList<TransactionUser>();
+		user.setTransactionsPayer(listTransactions);
+		user.setTransactionsReceiver(listTransactions);
 		when(userService.getCurrentUser()).thenReturn(user);
-		when(transactionUserService.getPagination(0, 3, user)).thenReturn(new ArrayList<TransactionUser>());
-		when(transactionUserService.getPageNumber(3, user)).thenReturn(0);
+		when(paginationService.getPageNumber(3, listTransactions)).thenReturn(0);
 
 		// WHEN
 		String result = transferController.getTransferPage(m, null, null);
@@ -48,26 +55,11 @@ public class TransferControllerTest {
 		// THEN
 		assertEquals("transfer", result);
 	}
-	
-	@Test
-	public void getHomePage_ShouldReturnHomePageWithNotNullPagination() {
-		// GIVEN	
-		Model m = new ExtendedModelMap();
-		User user = new User("user@gmail.com", "user");
-		when(userService.getCurrentUser()).thenReturn(user);
-		when(transactionUserService.getPagination(2, 4, user)).thenReturn(new ArrayList<TransactionUser>());
-		when(transactionUserService.getPageNumber(4, user)).thenReturn(0);
 
-		// WHEN
-		String result = transferController.getTransferPage(m, 2, 4);
-
-		// THEN
-		assertEquals("transfer", result);
-	}
-	
 	@Test
-	public void postTransferWithUser_ShouldRedirectOnTranferPageSuccess() throws RessourceNotFoundException, ImpossibleTransferException, AlreadyExistException {
-		// GIVEN	
+	public void postTransferWithUser_ShouldRedirectOnTranferPageSuccess() throws RessourceNotFoundException,
+			ImpossibleTransferException, AlreadyExistException, TransactionFailedException {
+		// GIVEN
 		User user = new User("user@gmail.com", "user");
 		TransferUserDTO transferDTO = new TransferUserDTO("user@gmail.com", "", 1);
 		when(userService.getCurrentUser()).thenReturn(user);
@@ -78,20 +70,22 @@ public class TransferControllerTest {
 		// THEN
 		assertEquals("redirect:/transfer?success", result);
 	}
-	
+
 	@Test
-	public void postTransferWithUser_ShouldRedirectOnTranferPageError() throws AlreadyExistException, RessourceNotFoundException, ImpossibleTransferException {
-		// GIVEN	
+	public void postTransferWithUser_ShouldRedirectOnTranferPageError() throws AlreadyExistException,
+			RessourceNotFoundException, ImpossibleTransferException, TransactionFailedException {
+		// GIVEN
 		User user = new User("user@gmail.com", "user");
 		TransferUserDTO transferDTO = new TransferUserDTO("user@gmail.com", "", 1);
 		when(userService.getCurrentUser()).thenReturn(user);
-		doThrow(new ImpossibleTransferException("")).when(transactionUserService).newTransferWithUser(transferDTO, user);
-		
+		doThrow(new ImpossibleTransferException("")).when(transactionUserService).newTransferWithUser(transferDTO,
+				user);
+
 		// WHEN
 		String result = transferController.postTransferWithUser(transferDTO);
 
 		// THEN
 		assertEquals("redirect:/transfer?error", result);
 	}
-	
+
 }

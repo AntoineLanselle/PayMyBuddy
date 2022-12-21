@@ -136,9 +136,6 @@ public class UserServiceImpl implements UserService {
 			user.getConnections().add(newConnection);
 			return updateUser(user);
 		}
-
 	}
-	
-	
 
 }

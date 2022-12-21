@@ -1,7 +1,6 @@
 package com.payMyBuddy.app.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.payMyBuddy.app.DTO.TransferUserDTO;
 import com.payMyBuddy.app.exception.ImpossibleTransferException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
 import com.payMyBuddy.app.model.TransactionUser;
 import com.payMyBuddy.app.model.User;
 import com.payMyBuddy.app.repository.TransactionUserRepository;
@@ -45,8 +45,9 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 	 * 
 	 */
 	@Override
+	@Transactional(rollbackOn = TransactionFailedException.class)
 	public void newTransferWithUser(TransferUserDTO transferUserDTO, User user)
-			throws RessourceNotFoundException, ImpossibleTransferException {
+			throws RessourceNotFoundException, ImpossibleTransferException, TransactionFailedException {
 
 		User userReceiver = userService.findByEmail(transferUserDTO.getReceiver());
 
@@ -66,9 +67,14 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 			applicationAccount.setBalance(applicationAccount.getBalance() + transferUser.getTax());
 			
 			// update the changes
-			userService.updateUser(user);
-			userService.updateUser(userReceiver);
-			userService.updateUser(applicationAccount);
+			try {
+				userService.updateUser(user);
+				userService.updateUser(userReceiver);
+				userService.updateUser(applicationAccount);
+			} catch (Exception e) {
+				throw new TransactionFailedException("Transaction failed can not join database.");
+			}
+			
 
 		} else {
 			String error = "Transaction between users impossible";
@@ -87,39 +93,6 @@ public class TransactionUserServiceImpl implements TransactionUserService {
 			return tax;
 		} else {
 			return 0.01;
-		}
-	}
-
-	@Override
-	public List<TransactionUser> getPagination(int page, int size, User user) {
-		List<TransactionUser> pageTransfers = new ArrayList<TransactionUser>();
-		pageTransfers.addAll(user.getTransactionsPayer());
-		pageTransfers.addAll(user.getTransactionsReceiver());
-		
-		if(pageTransfers.size() >= ((page*size)+size)) {
-			return pageTransfers.subList(page*size, (page*size)+size);
-		} else {
-			List<TransactionUser> pageLastTransfers = new ArrayList<TransactionUser>();
-			int reste = pageTransfers.size()-(page*size);
-			for(int i=0; i < reste; i++) {
-				pageLastTransfers.add(pageTransfers.get(pageTransfers.size()-reste+i));
-			}
-			return pageLastTransfers;
-		}
-
-	}
-
-	@Override
-	public int getPageNumber(int pageSize, User user) {
-		List<TransactionUser> pageTransfers = new ArrayList<TransactionUser>();
-		pageTransfers.addAll(user.getTransactionsPayer());
-		pageTransfers.addAll(user.getTransactionsReceiver());
-		
-		int number = pageTransfers.size()/pageSize;
-		if(number*pageSize < pageTransfers.size()) {
-			return number+1;
-		} else {
-			return number;
 		}
 	}
 

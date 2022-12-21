@@ -5,12 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.payMyBuddy.app.DTO.UserRegistrationDTO;
@@ -49,38 +53,19 @@ public class UserServiceImplTest {
 		User userSixe = new User("userSixe@gmail.com", "userSixe");
 		when(userServiceImpl.existsByEmail(userSixe.getEmail()) || userSixe.getEmail().equals("")).thenReturn(true);
 
-		// WHEN
-
-		// THEN
+		// WHEN // THEN
 		assertThrows(AlreadyExistException.class, () -> {
 			userServiceImpl.addUser(userSixe);
 		});
 	}
 
 	@Test
-	public void saveUser_ShouldReturnUserWithUserRegistrationDTO() throws AlreadyExistException {
-		// GIVEN
-		User userSixe = new User("userSixe@gmail.com", "userSixe");
-		UserRegistrationDTO userRegistration = new UserRegistrationDTO("userSixe@gmail.com", "userSixe");
-		when(passwordEncoder.encode(userRegistration.getPassword())).thenReturn("userSixe");
-		when(userServiceImpl.addUser(userSixe)).thenReturn(userSixe);
-
-		// WHEN
-		User result = userServiceImpl.saveUser(userRegistration);
-
-		// THEN
-		assertEquals(userSixe, result);
-	}
-
-	@Test
 	public void saveUser_ShouldthrowAlreadyExistException() throws AlreadyExistException {
 		// GIVEN
 		UserRegistrationDTO userRegistration = new UserRegistrationDTO("userSixe@gmail.com", "userSixe");
-		when(userServiceImpl.existsByEmail("userSixe@gmail.com") || false).thenReturn(true);
+		when(userServiceImpl.existsByEmail("userSixe@gmail.com")).thenReturn(true);
 
-		// WHEN
-
-		// THEN
+		// WHEN // THEN
 		assertThrows(AlreadyExistException.class, () -> {
 			userServiceImpl.saveUser(userRegistration);
 		});
@@ -106,30 +91,14 @@ public class UserServiceImplTest {
 		User userSixe = new User("userSixe@gmail.com", "newUserSixe");
 		when(!userServiceImpl.existsByEmail(userSixe.getEmail())).thenReturn(false);
 
-		// WHEN
-
-		// THEN
+		// WHEN // THEN
 		assertThrows(RessourceNotFoundException.class, () -> {
 			userServiceImpl.updateUser(userSixe);
 		});
 	}
 
 	@Test
-	public void getCurrentUser_ShouldReturnCurrentUser() {
-		// GIVEN
-		User user = new User("userTest@gmail.com", "userTest");
-		when(Authentication.class != null).thenReturn(true);
-		when(userRepository.findByEmail(null)).thenReturn(user);
-
-		// WHEN
-		User result = userServiceImpl.getCurrentUser();
-
-		// THEN
-		assertEquals(user, result);
-	}
-
-	@Test
-	public void getCurrentUser_ShouldReturnNullUser() {
+	public void getCurrentUser_ShouldReturnNull() {
 		// GIVEN
 		when(Authentication.class != null).thenReturn(false);
 
@@ -148,6 +117,7 @@ public class UserServiceImplTest {
 
 		// WHEN
 		Boolean result = userServiceImpl.existsByEmail(email);
+		
 		// THEN
 		assertTrue(result);
 	}
@@ -161,8 +131,35 @@ public class UserServiceImplTest {
 
 		// WHEN
 		User result = userServiceImpl.findByEmail(email);
+		
 		// THEN
 		assertEquals(email, result.getEmail());
+	}
+	
+	@Test
+	public void loeadUserByUsername_ShouldReturnUserDetails() {
+		// GIVEN
+		User user = new User("userTest@gmail.com", "userTest");
+		when(userRepository.findByEmail("userTest@gmail.com")).thenReturn(user);
+		
+		// WHEN
+		UserDetails result = userServiceImpl.loadUserByUsername("userTest@gmail.com");
+		
+		// THEN
+		assertEquals("userTest@gmail.com", result.getUsername());
+		assertEquals("userTest", result.getPassword());
+	}
+	
+	
+	@Test
+	public void loeadUserByUsername_ShouldThrowUsernameNotFoundException() {
+		// GIVEN
+		
+		// WHEN // THEN
+		assertThrows(UsernameNotFoundException.class, () -> {
+			userServiceImpl.loadUserByUsername("userTest@gmail.com");
+		});
+		
 	}
 
 	@Test
@@ -170,13 +167,15 @@ public class UserServiceImplTest {
 			throws RessourceNotFoundException, ImpossibleConnectionException {
 		// GIVEN
 		User user = new User("userTest@gmail.com", "userTest");
+		user.setConnections(new ArrayList<User>());
 		User connection = new User("connection@gmail.com", "connection");
-		String email = "connection@gmail.com";
-		when(userServiceImpl.findByEmail(email)).thenReturn(connection);
-		when(userServiceImpl.updateUser(user)).thenReturn(user);
+
+		when(userRepository.findByEmail(connection.getEmail())).thenReturn(connection);
+		when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+		when(userRepository.save(user)).thenReturn(user);
 
 		// WHEN
-		User result = userServiceImpl.saveConnection(user, email);
+		User result = userServiceImpl.saveConnection(user, connection.getEmail());
 
 		// THEN
 		assertEquals(user, result);
@@ -189,9 +188,7 @@ public class UserServiceImplTest {
 		String email = "connection@gmail.com";
 		when(userServiceImpl.findByEmail(email)).thenReturn(null);
 
-		// WHEN
-
-		// THEN
+		// WHEN // THEN
 		assertThrows(ImpossibleConnectionException.class, () -> {
 			userServiceImpl.saveConnection(user, email);
 		});

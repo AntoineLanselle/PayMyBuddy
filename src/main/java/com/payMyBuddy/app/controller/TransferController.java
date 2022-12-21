@@ -17,8 +17,10 @@ import com.payMyBuddy.app.DTO.TransferUserDTO;
 import com.payMyBuddy.app.exception.AlreadyExistException;
 import com.payMyBuddy.app.exception.ImpossibleTransferException;
 import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
 import com.payMyBuddy.app.model.TransactionUser;
 import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.service.PaginationService;
 import com.payMyBuddy.app.service.TransactionUserService;
 import com.payMyBuddy.app.service.UserService;
 
@@ -32,25 +34,33 @@ public class TransferController {
 	private UserService userService;
 	@Autowired
 	private TransactionUserService transactionUserService;
+	@Autowired
+	private PaginationService paginationService;
 
 	/**
 	 * 
 	 */
 	@GetMapping
-	public String getTransferPage(Model model, @RequestParam(required=false) Integer page, @RequestParam(required=false) Integer size) {
+	@SuppressWarnings("unchecked")
+	public String getTransferPage(Model model, @RequestParam(required = false) Integer page,
+			@RequestParam(required = false) Integer size) {
 
-		LOGGER.info("GET - transfer page");
+		int currentPage = page == null ? 0 : page;
+		int pageSize = size == null ? 3 : size;
 
-        int currentPage = page == null ? 0 : page;
-        int pageSize = size == null ? 3 : size;
-		 
+		LOGGER.info("GET - transfer page " + currentPage);
+
 		User user = userService.getCurrentUser();
-		List<TransactionUser> transfers = transactionUserService.getPagination(currentPage, pageSize, user);
-		int pageNumber = transactionUserService.getPageNumber(pageSize, user);
+		List<TransactionUser> allTransfer = user.getTransactionsPayer();
+		allTransfer.addAll(user.getTransactionsReceiver());
+		List<TransactionUser> pagedTransfer = (List<TransactionUser>) paginationService.getPagination(currentPage,
+				pageSize, allTransfer);
+		int totalPageNumber = paginationService.getPageNumber(pageSize, allTransfer);
 
 		model.addAttribute("user", user);
-		model.addAttribute("transfers", transfers);
-		model.addAttribute("pageNumber", pageNumber);
+		model.addAttribute("transfers", pagedTransfer);
+		model.addAttribute("pageNumber", currentPage);
+		model.addAttribute("totalPageNumber", totalPageNumber);
 
 		return "transfer";
 	}
@@ -59,11 +69,13 @@ public class TransferController {
 	 * @throws AlreadyExistException
 	 * @throws RessourceNotFoundException
 	 * @throws ImpossibleTransferException
+	 * @throws TransactionFailedException
 	 * 
 	 */
 	@PostMapping
 	public String postTransferWithUser(@ModelAttribute("transferUser") TransferUserDTO transferUser)
-			throws RessourceNotFoundException, ImpossibleTransferException, AlreadyExistException {
+			throws RessourceNotFoundException, ImpossibleTransferException, AlreadyExistException,
+			TransactionFailedException {
 
 		LOGGER.info("POST - make a new transaction between users");
 		User user = userService.getCurrentUser();
