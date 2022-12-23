@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PayMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.payMyBuddy.app.controller</a> &gt; <span class="el_source">WebController.java</span></div><h1>WebController.java</h1><pre class="source lang-java linenums">package com.payMyBuddy.app.controller;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.service.UserService;
+
+/**
+ * 
+ * @author Antoine
+ */
+@Controller
+<span class="fc" id="L18">public class WebController {</span>
+
+<span class="fc" id="L20">	private static final Logger LOGGER = LogManager.getLogger(WebController.class);</span>
+	
+	@Autowired
+	private UserService userService;
+	
+	/**
+	 * 
+	 */
+	@GetMapping(&quot;/login&quot;)
+	public String getLoginPage() {
+<span class="fc" id="L30">		LOGGER.info(&quot;GET - login page&quot;);</span>
+<span class="fc" id="L31">		return &quot;login&quot;;</span>
+	}
+	
+	/**
+	 * 
+	 */
+	@GetMapping(&quot;/index&quot;)
+	public String getHomePage(Model model) {
+<span class="fc" id="L39">		User user = userService.getCurrentUser();</span>
+<span class="fc" id="L40">		model.addAttribute(&quot;email&quot;, user.getEmail());</span>
+<span class="fc" id="L41">		LOGGER.info(&quot;GET - &quot; + user.getEmail() + &quot; home page&quot;);</span>
+<span class="fc" id="L42">		return &quot;index&quot;;</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

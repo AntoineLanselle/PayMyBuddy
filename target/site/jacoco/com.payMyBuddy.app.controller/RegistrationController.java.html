@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegistrationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PayMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.payMyBuddy.app.controller</a> &gt; <span class="el_source">RegistrationController.java</span></div><h1>RegistrationController.java</h1><pre class="source lang-java linenums">package com.payMyBuddy.app.controller;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.payMyBuddy.app.DTO.UserRegistrationDTO;
+import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.service.UserService;
+
+/**
+ * 
+ * @author Antoine
+ */
+@Controller
+@RequestMapping(&quot;/registration&quot;)
+<span class="fc" id="L23">public class RegistrationController {</span>
+
+<span class="fc" id="L25">	private static final Logger LOGGER = LogManager.getLogger(RegistrationController.class);</span>
+	
+	@Autowired
+	private UserService userService;
+	
+	/**
+	 * 
+	 */
+	@GetMapping
+	public String getRegistrationPage(Model model) {
+<span class="fc" id="L35">		model.addAttribute(&quot;user&quot;, new UserRegistrationDTO());</span>
+<span class="fc" id="L36">		LOGGER.info(&quot;GET - registration page&quot;);</span>
+<span class="fc" id="L37">		return &quot;registration&quot;;</span>
+	}
+	
+	/**
+	 * @throws AlreadyExistException 
+	 * 
+	 */
+	@PostMapping
+	public String postRegisterUserAccount(@ModelAttribute(&quot;user&quot;) UserRegistrationDTO userRegistration) throws AlreadyExistException {
+<span class="fc" id="L46">		LOGGER.info(&quot;POST - Add user in database - &quot; + userRegistration.getEmail());</span>
+		try {
+<span class="fc" id="L48">			userService.saveUser(userRegistration);</span>
+<span class="fc" id="L49">			return &quot;redirect:/registration?success&quot;;</span>
+<span class="fc" id="L50">		} catch(AlreadyExistException error) {</span>
+<span class="fc" id="L51">			return &quot;redirect:/registration?error&quot;;</span>
+		}
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

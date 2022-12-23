@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PayMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.payMyBuddy.app.controller</a> &gt; <span class="el_source">ProfileController.java</span></div><h1>ProfileController.java</h1><pre class="source lang-java linenums">package com.payMyBuddy.app.controller;
+
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.payMyBuddy.app.DTO.TransferBankDTO;
+import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleTransferException;
+import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
+import com.payMyBuddy.app.model.TransactionBank;
+import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.service.PaginationService;
+import com.payMyBuddy.app.service.TransactionBankService;
+import com.payMyBuddy.app.service.UserService;
+
+@Controller
+<span class="fc" id="L27">public class ProfileController {</span>
+
+<span class="fc" id="L29">	private static final Logger LOGGER = LogManager.getLogger(WebController.class);</span>
+
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private TransactionBankService transactionBankservice;
+	@Autowired
+	private PaginationService paginationService;
+
+	/**
+	 * 
+	 */
+	@GetMapping(&quot;/profile&quot;)
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public String getProfilePage(Model model, @RequestParam(required = false) Integer page,
+			@RequestParam(required = false) Integer size) {
+
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">		int currentPage = page == null ? 0 : page;</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">		int pageSize = size == null ? 3 : size;</span>
+
+<span class="fc" id="L49">		LOGGER.info(&quot;GET - profile page &quot; + currentPage);</span>
+
+<span class="fc" id="L51">		User user = userService.getCurrentUser();</span>
+<span class="fc" id="L52">		List&lt;TransactionBank&gt; allTransfer = user.getTransactionsBank();</span>
+<span class="fc" id="L53">		List&lt;TransactionBank&gt; pagedTransfer = (List&lt;TransactionBank&gt;) paginationService.getPagination(currentPage,</span>
+				pageSize, allTransfer);
+<span class="fc" id="L55">		int totalPageNumber = paginationService.getPageNumber(pageSize, allTransfer);</span>
+
+<span class="fc" id="L57">		model.addAttribute(&quot;user&quot;, user);</span>
+<span class="fc" id="L58">		model.addAttribute(&quot;transfers&quot;, pagedTransfer);</span>
+<span class="fc" id="L59">		model.addAttribute(&quot;pageNumber&quot;, currentPage);</span>
+<span class="fc" id="L60">		model.addAttribute(&quot;totalPageNumber&quot;, totalPageNumber);</span>
+
+<span class="fc" id="L62">		return &quot;profile&quot;;</span>
+	}
+
+	/**
+	 * @throws RessourceNotFoundException
+	 * @throws AlreadyExistException
+	 * @throws TransactionFailedException
+	 * 
+	 */
+	@PostMapping(&quot;/profileAdd&quot;)
+	public String postTransferFromBank(@ModelAttribute(&quot;transferBank&quot;) TransferBankDTO transferBank)
+			throws AlreadyExistException, RessourceNotFoundException, TransactionFailedException {
+<span class="fc" id="L74">		User user = userService.getCurrentUser();</span>
+<span class="fc" id="L75">		LOGGER.info(&quot;POST - new transfer of &quot; + user.getEmail() + &quot; with bank &quot; + transferBank.getBankAccount()</span>
+				+ &quot; on balance&quot;);
+		try {
+<span class="fc" id="L78">			transactionBankservice.transferOnBalance(transferBank, user);</span>
+<span class="fc" id="L79">			return &quot;redirect:/profile?success&quot;;</span>
+<span class="fc" id="L80">		} catch (ImpossibleTransferException e) {</span>
+<span class="fc" id="L81">			return &quot;redirect:/profile?error&quot;;</span>
+		}
+	}
+
+	/**
+	 * @throws AlreadyExistException
+	 * @throws RessourceNotFoundException
+	 * @throws TransactionFailedException
+	 * 
+	 */
+	@PostMapping(&quot;/profileMinus&quot;)
+	public String postTransferToBank(@ModelAttribute(&quot;transferBank&quot;) TransferBankDTO transferBank)
+			throws RessourceNotFoundException, AlreadyExistException, TransactionFailedException {
+<span class="fc" id="L94">		User user = userService.getCurrentUser();</span>
+<span class="fc" id="L95">		LOGGER.info(&quot;POST - new transfer of &quot; + user.getEmail() + &quot; to bank &quot; + transferBank.getBankAccount());</span>
+		try {
+<span class="fc" id="L97">			transactionBankservice.transferOnBank(transferBank, user);</span>
+<span class="fc" id="L98">			return &quot;redirect:/profile?success&quot;;</span>
+<span class="fc" id="L99">		} catch (ImpossibleTransferException e) {</span>
+<span class="fc" id="L100">			return &quot;redirect:/profile?error&quot;;</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

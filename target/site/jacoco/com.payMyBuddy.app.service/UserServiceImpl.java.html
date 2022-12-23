@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PayMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.payMyBuddy.app.service</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package com.payMyBuddy.app.service;
+
+import java.util.Collections;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.payMyBuddy.app.DTO.UserRegistrationDTO;
+import com.payMyBuddy.app.exception.AlreadyExistException;
+import com.payMyBuddy.app.exception.ImpossibleConnectionException;
+import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.repository.UserRepository;
+
+/**
+ * 
+ * @author Antoine
+ */
+@Service
+<span class="fc" id="L28">public class UserServiceImpl implements UserService {</span>
+
+<span class="fc" id="L30">	private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);</span>
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
+
+	/**
+	 * 
+	 */
+	@Override
+	public User addUser(User user) throws AlreadyExistException {
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">		if (existsByEmail(user.getEmail()) || user.getEmail().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L44">			String error = &quot;User: &quot; + user.getEmail() + &quot; already exist.&quot;;</span>
+<span class="fc" id="L45">			LOGGER.error(error);</span>
+<span class="fc" id="L46">			throw new AlreadyExistException(error);</span>
+		} else {
+<span class="fc" id="L48">			String info = &quot;Adding in database User: &quot; + user.getEmail();</span>
+<span class="fc" id="L49">			LOGGER.info(info);</span>
+<span class="fc" id="L50">			return userRepository.save(user);</span>
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public User saveUser(UserRegistrationDTO userRegistration) throws AlreadyExistException {
+<span class="fc" id="L59">		User user = new User(userRegistration.getEmail(), passwordEncoder.encode(userRegistration.getPassword()));</span>
+<span class="fc" id="L60">		String info = &quot;Trying to save from registration page User: &quot; + user.getEmail();</span>
+<span class="fc" id="L61">		LOGGER.info(info);</span>
+<span class="nc" id="L62">		return addUser(user);</span>
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public User updateUser(User user) throws RessourceNotFoundException {
+<span class="fc bfc" id="L70" title="All 2 branches covered.">		if (!existsByEmail(user.getEmail())) {</span>
+<span class="fc" id="L71">			String error = &quot;User: &quot; + user.getEmail() + &quot; not found.&quot;;</span>
+<span class="fc" id="L72">			LOGGER.error(error);</span>
+<span class="fc" id="L73">			throw new RessourceNotFoundException(error);</span>
+		} else {
+<span class="fc" id="L75">			String info = &quot;Updating in database User: &quot; + user.getEmail();</span>
+<span class="fc" id="L76">			LOGGER.info(info);</span>
+<span class="fc" id="L77">			return userRepository.save(user);</span>
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public User getCurrentUser() {
+<span class="fc" id="L86">		Authentication auth = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">		if (auth != null) {</span>
+<span class="nc" id="L88">			return userRepository.findByEmail(auth.getName());</span>
+		} else {
+<span class="fc" id="L90">			return null;</span>
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Boolean existsByEmail(String email) {
+<span class="fc" id="L99">		return userRepository.existsByEmail(email);</span>
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public User findByEmail(String email) {
+<span class="fc" id="L107">		return userRepository.findByEmail(email);</span>
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+<span class="fc" id="L115">		User user = userRepository.findByEmail(username);</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">		if (user == null) {</span>
+<span class="fc" id="L117">			String error = username + &quot;not found&quot;;</span>
+<span class="fc" id="L118">			throw new UsernameNotFoundException(error);</span>
+		} else {
+<span class="fc" id="L120">			return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),</span>
+<span class="fc" id="L121">					Collections.singletonList(new SimpleGrantedAuthority(&quot;ROLE_USER&quot;)));</span>
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public User saveConnection(User user, String email)
+			throws RessourceNotFoundException, ImpossibleConnectionException {
+<span class="fc" id="L131">		User newConnection = findByEmail(email);</span>
+<span class="pc bpc" id="L132" title="2 of 6 branches missed.">		if (newConnection == null || newConnection == user || user.getConnections().contains(newConnection)) {</span>
+<span class="fc" id="L133">			String error = &quot;Impossible to make connection between&quot; + user.getEmail() + &quot; and &quot; + email + &quot;.&quot;;</span>
+<span class="fc" id="L134">			throw new ImpossibleConnectionException(error);</span>
+		} else {
+<span class="fc" id="L136">			user.getConnections().add(newConnection);</span>
+<span class="fc" id="L137">			return updateUser(user);</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

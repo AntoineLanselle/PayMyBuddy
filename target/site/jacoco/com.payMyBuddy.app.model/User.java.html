@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PayMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.payMyBuddy.app.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.payMyBuddy.app.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+/**
+ * 
+ * 
+ * @author Antoine
+ */
+@Entity
+@Table(name = &quot;user&quot;)
+public class User {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = &quot;id&quot;)
+	private int id;
+
+	@Column(name = &quot;email&quot;)
+	private String email;
+
+	@Column(name = &quot;password&quot;)
+	private String password;
+
+	@Column(name = &quot;balance&quot;)
+	private double balance;
+
+<span class="fc" id="L41">	@ManyToMany(fetch = FetchType.EAGER)</span>
+	@JoinTable(
+			name = &quot;user_connection&quot;, 
+			joinColumns = @JoinColumn(name = &quot;user_id&quot;), 
+			inverseJoinColumns = @JoinColumn(name = &quot;connection_id&quot;))
+	  private List&lt;User&gt; connections = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L48">	@OneToMany(mappedBy = &quot;payer&quot;, fetch = FetchType.LAZY) </span>
+	private List&lt;TransactionUser&gt; transactionsPayer = new ArrayList&lt;&gt;();
+	
+<span class="fc" id="L51">	@OneToMany(mappedBy = &quot;receiver&quot;, fetch = FetchType.LAZY) </span>
+	private List&lt;TransactionUser&gt; transactionsReceiver = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L54">	@OneToMany(mappedBy = &quot;user&quot;, fetch = FetchType.LAZY)</span>
+	private List&lt;TransactionBank&gt; transactionsBank = new ArrayList&lt;&gt;();
+	
+<span class="fc" id="L57">	public User(String email, String password) {</span>
+<span class="fc" id="L58">		setEmail(email);</span>
+<span class="fc" id="L59">		setPassword(password);</span>
+<span class="fc" id="L60">		setBalance(0);</span>
+<span class="fc" id="L61">	}</span>
+	
+<span class="fc" id="L63">	public User() {</span>
+<span class="fc" id="L64">	}</span>
+	
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+<span class="fc" id="L70">		return id;</span>
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+<span class="nc" id="L77">		this.id = id;</span>
+<span class="nc" id="L78">	}</span>
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+<span class="fc" id="L84">		return email;</span>
+	}
+
+	/**
+	 * @param email the email to set
+	 */
+	public void setEmail(String email) {
+<span class="fc" id="L91">		this.email = email;</span>
+<span class="fc" id="L92">	}</span>
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword() {
+<span class="fc" id="L98">		return password;</span>
+	}
+
+	/**
+	 * @param password the password to set
+	 */
+	public void setPassword(String password) {
+<span class="fc" id="L105">		this.password = password;</span>
+<span class="fc" id="L106">	}</span>
+
+	/**
+	 * @return the balance
+	 */
+	public double getBalance() {
+<span class="fc" id="L112">		return balance;</span>
+	}
+
+	/**
+	 * @param balance the balance to set
+	 */
+	public void setBalance(double balance) {
+<span class="fc" id="L119">		this.balance = balance;</span>
+<span class="fc" id="L120">	}</span>
+
+	/**
+	 * @return the connections
+	 */
+	public List&lt;User&gt; getConnections() {
+<span class="fc" id="L126">		return connections;</span>
+	}
+
+	/**
+	 * @param connections the connections to set
+	 */
+	public void setConnections(List&lt;User&gt; connections) {
+<span class="fc" id="L133">		this.connections = connections;</span>
+<span class="fc" id="L134">	}</span>
+
+	/**
+	 * @return the transactionsUser
+	 */
+	public List&lt;TransactionUser&gt; getTransactionsPayer() {
+<span class="fc" id="L140">		return transactionsPayer;</span>
+	}
+
+	/**
+	 * @param transactionsUser the transactionsUser to set
+	 */
+	public void setTransactionsPayer(List&lt;TransactionUser&gt; transactionsUser) {
+<span class="fc" id="L147">		this.transactionsPayer = transactionsUser;</span>
+<span class="fc" id="L148">	}</span>
+	
+	/**
+	 * @return the transactionsUser
+	 */
+	public List&lt;TransactionUser&gt; getTransactionsReceiver() {
+<span class="fc" id="L154">		return transactionsReceiver;</span>
+	}
+
+	/**
+	 * @param transactionsUser the transactionsUser to set
+	 */
+	public void setTransactionsReceiver(List&lt;TransactionUser&gt; transactionsUser) {
+<span class="fc" id="L161">		this.transactionsReceiver = transactionsUser;</span>
+<span class="fc" id="L162">	}</span>
+
+	/**
+	 * @return the transactionsAccount
+	 */
+	public List&lt;TransactionBank&gt; getTransactionsBank() {
+<span class="fc" id="L168">		return transactionsBank;</span>
+	}
+
+	/**
+	 * @param transactionsAccount the transactionsAccount to set
+	 */
+	public void setTransactionsBank(List&lt;TransactionBank&gt; transactionsBank) {
+<span class="fc" id="L175">		this.transactionsBank = transactionsBank;</span>
+<span class="fc" id="L176">	}	</span>
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

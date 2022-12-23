@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionUserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PayMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.payMyBuddy.app.service</a> &gt; <span class="el_source">TransactionUserServiceImpl.java</span></div><h1>TransactionUserServiceImpl.java</h1><pre class="source lang-java linenums">package com.payMyBuddy.app.service;
+
+import javax.transaction.Transactional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.payMyBuddy.app.DTO.TransferUserDTO;
+import com.payMyBuddy.app.exception.ImpossibleTransferException;
+import com.payMyBuddy.app.exception.RessourceNotFoundException;
+import com.payMyBuddy.app.exception.TransactionFailedException;
+import com.payMyBuddy.app.model.TransactionUser;
+import com.payMyBuddy.app.model.User;
+import com.payMyBuddy.app.repository.TransactionUserRepository;
+
+/**
+ * 
+ * 
+ * @author Antoine
+ */
+@Service
+<span class="fc" id="L24">public class TransactionUserServiceImpl implements TransactionUserService {</span>
+
+<span class="fc" id="L26">	private static final Logger LOGGER = LogManager.getLogger(TransactionUserServiceImpl.class);</span>
+
+	@Autowired
+	private TransactionUserRepository transactionUserRepository;
+	@Autowired
+	private UserService userService;
+
+	/*
+	 * 
+	 */
+	@Override
+	public TransactionUser addTransactionUser(TransactionUser transactionUser) {
+<span class="fc" id="L38">		String info = &quot;Saving transaction between Users:&quot; + transactionUser.getPayer().getEmail() + &quot; and &quot;</span>
+<span class="fc" id="L39">				+ transactionUser.getReceiver().getEmail();</span>
+<span class="fc" id="L40">		LOGGER.info(info);</span>
+<span class="fc" id="L41">		return transactionUserRepository.save(transactionUser);</span>
+	}
+
+	/*
+	 * 
+	 */
+	@Override
+	@Transactional(rollbackOn = TransactionFailedException.class)
+	public void newTransferWithUser(TransferUserDTO transferUserDTO, User user)
+			throws RessourceNotFoundException, ImpossibleTransferException, TransactionFailedException {
+
+<span class="fc" id="L52">		User userReceiver = userService.findByEmail(transferUserDTO.getReceiver());</span>
+
+		// verify the transfer is valid
+<span class="pc bpc" id="L55" title="1 of 4 branches missed.">		if (userReceiver != null &amp;&amp; transferUserDTO.getAmount() &gt; 0</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">				&amp;&amp; (user.getBalance() - (transferUserDTO.getAmount() * 1.005)) &gt;= 0) {</span>
+
+			// create the new transfer and add it in database
+<span class="fc" id="L59">			TransactionUser transferUser = new TransactionUser(user, userReceiver, transferUserDTO.getDescription(),</span>
+<span class="fc" id="L60">					transferUserDTO.getAmount(), calculateTax(transferUserDTO.getAmount()));</span>
+<span class="fc" id="L61">			addTransactionUser(transferUser);</span>
+
+			// operations on the balance of users
+<span class="fc" id="L64">			User applicationAccount = userService.findByEmail(&quot;applicationBalance&quot;);</span>
+<span class="fc" id="L65">			user.setBalance(user.getBalance() - (transferUser.getAmount() + transferUser.getTax()));</span>
+<span class="fc" id="L66">			userReceiver.setBalance(userReceiver.getBalance() + transferUser.getAmount());</span>
+<span class="fc" id="L67">			applicationAccount.setBalance(applicationAccount.getBalance() + transferUser.getTax());</span>
+			
+			// update the changes
+			try {
+<span class="fc" id="L71">				userService.updateUser(user);</span>
+<span class="fc" id="L72">				userService.updateUser(userReceiver);</span>
+<span class="fc" id="L73">				userService.updateUser(applicationAccount);</span>
+<span class="nc" id="L74">			} catch (Exception e) {</span>
+<span class="nc" id="L75">				throw new TransactionFailedException(&quot;Transaction failed can not join database.&quot;);</span>
+<span class="fc" id="L76">			}</span>
+			
+
+<span class="fc" id="L79">		} else {</span>
+<span class="fc" id="L80">			String error = &quot;Transaction between users impossible&quot;;</span>
+<span class="fc" id="L81">			LOGGER.error(error);</span>
+<span class="fc" id="L82">			throw new ImpossibleTransferException(error);</span>
+		}
+<span class="fc" id="L84">	}</span>
+	
+	/*
+	 * 
+	 */
+	@Override
+	public double calculateTax(double amount) {
+<span class="fc" id="L91">		Double tax = ((double)((int)(amount*0.005*100)))/100;</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">		if(tax &gt; 0) {</span>
+<span class="fc" id="L93">			return tax;</span>
+		} else {
+<span class="fc" id="L95">			return 0.01;</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
